@@ -25,6 +25,8 @@
 
     - {'name': 'matrix_bot_baibot_config_agents_static_definitions_openai_config_api_key', when: "{{ matrix_bot_baibot_config_agents_static_definitions_openai_enabled }}"}
 
+    - {'name': 'matrix_bot_baibot_config_agents_static_definitions_venice_config_api_key', when: "{{ matrix_bot_baibot_config_agents_static_definitions_venice_enabled }}"}
+
 - name: Fail if baibot authentication mode is not configured
   ansible.builtin.fail:
     msg: >-
@@ -91,3 +93,4 @@
   when: "lookup('ansible.builtin.varnames', ('^' + item.old + '$'), wantlist=True) | length > 0"
   with_items:
     - {'old': 'matrix_bot_baibot_container_image_name_prefix', 'new': 'matrix_bot_baibot_container_image_registry_prefix'}
+    - {'old': 'matrix_bot_baibot_container_image_force_pull', 'new': '<removed> (the new community.docker.docker_image_pull module handles this natively)'}

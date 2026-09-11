@@ -25,6 +25,8 @@
     - {'name': 'matrix_authentication_service_container_labels_public_compatibility_layer_hostname', when: "{{ matrix_authentication_service_container_labels_public_compatibility_layer_enabled }}"}
     - {'name': 'matrix_authentication_service_container_labels_internal_compatibility_layer_entrypoints', when: "{{ matrix_authentication_service_container_labels_internal_compatibility_layer_enabled }}"}
     - {'name': 'matrix_authentication_service_config_email_hostname', when: "{{ matrix_authentication_service_config_email_transport == 'smtp' }}"}
+    - {'name': 'matrix_authentication_service_config_captcha_site_key', when: "{{ matrix_authentication_service_config_captcha_service != '' }}"}
+    - {'name': 'matrix_authentication_service_config_captcha_secret_key', when: "{{ matrix_authentication_service_config_captcha_service != '' }}"}
 
 - name: Fail if matrix_authentication_service_config_secrets_encryption is not 64 characters long
   ansible.builtin.fail:
@@ -35,6 +37,11 @@
   ansible.builtin.fail:
     msg: "matrix_authentication_service_config_email_transport must be one of: blackhole, smtp, or aws_ses"
   when: "matrix_authentication_service_config_email_transport not in ['blackhole', 'smtp', 'aws_ses']"
+
+- name: Fail if matrix_authentication_service_config_captcha_service is invalid
+  ansible.builtin.fail:
+    msg: "matrix_authentication_service_config_captcha_service must be one of: recaptcha_v2, cloudflare_turnstile, or hcaptcha (or empty, to disable CAPTCHA protection)"
+  when: "matrix_authentication_service_config_captcha_service not in ['', 'recaptcha_v2', 'cloudflare_turnstile', 'hcaptcha']"
 
 - name: (Deprecation) Catch and report renamed matrix-authentication-service settings
   ansible.builtin.fail:
@@ -53,3 +60,4 @@
     - {'old': 'matrix_authentication_service_syn2mas_container_image_self_build', 'new': '<removed>'}
     - {'old': 'matrix_authentication_service_syn2mas_process_extra_arguments', 'new': 'matrix_authentication_service_syn2mas_command_extra_options or matrix_authentication_service_syn2mas_subcommand_extra_options'}
     - {'old': 'matrix_authentication_service_syn2mas_dry_run', 'new': 'matrix_authentication_service_syn2mas_migrate_dry_run'}
+    - {'old': 'matrix_authentication_service_container_image_force_pull', 'new': '<removed> (the new community.docker.docker_image_pull module handles this natively)'}

@@ -4,7 +4,7 @@
 
 ## 🎯 Purpose
 
-This [Ansible](https://www.ansible.com/) playbook is meant to help you run your own [Matrix](http://matrix.org/) homeserver, along with the [various services](#supported-services) related to that.
+This [Ansible](https://www.ansible.com/) playbook is meant to help you run your own [Matrix](http://matrix.org/) homeserver, along with the [various services](#-supported-services) related to that.
 
 That is, it lets you join the Matrix network using your own user ID like `@alice:example.com`, all hosted on your own server (see [prerequisites](docs/prerequisites.md)).
 
@@ -53,6 +53,7 @@ The homeserver is the backbone of your Matrix system. Choose one from the follow
 | [Synapse](https://github.com/element-hq/synapse) | ✅ | Storing your data and managing your presence in the [Matrix](http://matrix.org/) network | [Link](docs/configuring-playbook-synapse.md) |
 | [Conduit](https://conduit.rs) | ❌ | Storing your data and managing your presence in the [Matrix](http://matrix.org/) network. Conduit is a lightweight open-source server implementation of the Matrix Specification with a focus on easy setup and low system requirements | [Link](docs/configuring-playbook-conduit.md) |
 | [continuwuity](https://continuwuity.org) | ❌ | Storing your data and managing your presence in the [Matrix](http://matrix.org/) network. | [Link](docs/configuring-playbook-continuwuity.md) |
+| [Tuwunel](https://matrix-construct.github.io/tuwunel/) | ❌ | Storing your data and managing your presence in the [Matrix](http://matrix.org/) network. Tuwunel is the official successor to conduwuit. | [Link](docs/configuring-playbook-tuwunel.md) |
 | [Dendrite](https://github.com/element-hq/dendrite) | ❌ | Storing your data and managing your presence in the [Matrix](http://matrix.org/) network. Dendrite is a second-generation Matrix homeserver written in Go, an alternative to Synapse. | [Link](docs/configuring-playbook-dendrite.md) |
 
 ### Clients
@@ -64,9 +65,10 @@ Web clients for Matrix that you can host on your own domains.
 | [Element Web](https://github.com/element-hq/element-web) | ✅ | Default Matrix web client, configured to connect to your own Synapse server | [Link](docs/configuring-playbook-client-element-web.md) |
 | [Hydrogen](https://github.com/element-hq/hydrogen-web) | ❌ | Lightweight Matrix client with legacy and mobile browser support | [Link](docs/configuring-playbook-client-hydrogen.md) |
 | [Cinny](https://github.com/ajbura/cinny) |  ❌ | Simple, elegant and secure web client | [Link](docs/configuring-playbook-client-cinny.md) |
-| [Sable](https://github.com/7w1/sable) | ❌ | Simple, elegant and secure web client | [Link](docs/configuring-playbook-client-sable.md) |
+| [Sable](https://github.com/SableClient/Sable) | ❌ | Simple, elegant and secure web client | [Link](docs/configuring-playbook-client-sable.md) |
 | [SchildiChat Web](https://schildi.chat/) | ❌ | Based on Element Web, with a more traditional instant messaging experience | [Link](docs/configuring-playbook-client-schildichat-web.md) |
 | [FluffyChat Web](https://fluffychat.im/) | ❌ | The cutest messenger in Matrix | [Link](docs/configuring-playbook-client-fluffychat-web.md) |
+| [Commet](https://github.com/commetchat/commet) | ❌ | Matrix web client | [Link](docs/configuring-playbook-client-commet.md) |
 
 ### Server Components
 
@@ -91,8 +93,6 @@ Extend and modify how users are authenticated on your homeserver.
 | [matrix-synapse-rest-auth](https://github.com/ma1uta/matrix-synapse-rest-password-provider) (advanced) | ❌ | REST authentication password provider module | [Link](docs/configuring-playbook-rest-auth.md) |
 |[matrix-synapse-shared-secret-auth](https://github.com/devture/matrix-synapse-shared-secret-auth) (advanced) | ❌ | Password provider module | [Link](docs/configuring-playbook-shared-secret-auth.md) |
 | [matrix-synapse-ldap3](https://github.com/matrix-org/matrix-synapse-ldap3) (advanced) | ❌ | LDAP Auth password provider module | [Link](docs/configuring-playbook-ldap-auth.md) |
-| [matrix-ldap-registration-proxy](https://gitlab.com/activism.international/matrix_ldap_registration_proxy) (advanced) | ❌ | Proxy that handles Matrix registration requests and forwards them to LDAP | [Link](docs/configuring-playbook-matrix-ldap-registration-proxy.md) |
-| [matrix-registration](https://github.com/ZerataX/matrix-registration) | ❌ | Simple python application to have a token based Matrix registration | [Link](docs/configuring-playbook-matrix-registration.md) |
 | [Matrix User Verification Service](https://github.com/matrix-org/matrix-user-verification-service) | ❌ | Service to verify details of a user based on an Open ID token | [Link](docs/configuring-playbook-user-verification-service.md) |
 | [synapse-simple-antispam](https://github.com/t2bot/synapse-simple-antispam) (advanced) | ❌ | Spam checker module | [Link](docs/configuring-playbook-synapse-simple-antispam.md) |
 
@@ -116,22 +116,25 @@ Bridges can be used to connect your Matrix installation with third-party communi
 | [mautrix-slack](https://github.com/mautrix/slack) | ❌ | Bridge to [Slack](https://slack.com/) | [Link](docs/configuring-playbook-bridge-mautrix-slack.md) |
 | [mautrix-telegram](https://github.com/mautrix/telegram) | ❌ | Bridge to [Telegram](https://telegram.org/) | [Link](docs/configuring-playbook-bridge-mautrix-telegram.md) |
 | [mautrix-gmessages](https://github.com/mautrix/gmessages) | ❌ | Bridge to [Google Messages](https://messages.google.com/) | [Link](docs/configuring-playbook-bridge-mautrix-gmessages.md) |
+| [mautrix-gvoice](https://github.com/mautrix/gvoice) | ❌ | Bridge to [Google Voice](https://voice.google.com/) | [Link](docs/configuring-playbook-bridge-mautrix-gvoice.md) |
+| [mautrix-linkedin](https://github.com/mautrix/linkedin) | ❌ | Bridge to [LinkedIn](https://www.linkedin.com/) | [Link](docs/configuring-playbook-bridge-mautrix-linkedin.md) |
 | [mautrix-whatsapp](https://github.com/mautrix/whatsapp) | ❌ | Bridge to [WhatsApp](https://www.whatsapp.com/) | [Link](docs/configuring-playbook-bridge-mautrix-whatsapp.md) |
 | [mautrix-wsproxy](https://github.com/mautrix/wsproxy) | ❌ | Bridge to Android SMS or Apple iMessage | [Link](docs/configuring-playbook-bridge-mautrix-wsproxy.md) |
+| [matrix-rustpush-bridge](https://github.com/jasonlaguidice/imessage) | ❌ | Bridge to [iMessage](https://support.apple.com/messages) via Apple Push Notification service | [Link](docs/configuring-playbook-bridge-rustpush.md) |
 | [mautrix-bluesky](https://github.com/mautrix/bluesky) | ❌ | Bridge to [Bluesky](https://bsky.social/) | [Link](docs/configuring-playbook-bridge-mautrix-bluesky.md) |
 | [mautrix-twitter](https://github.com/mautrix/twitter) | ❌ | Bridge to [Twitter](https://twitter.com/) | [Link](docs/configuring-playbook-bridge-mautrix-twitter.md) |
 | [mautrix-googlechat](https://github.com/mautrix/googlechat) | ❌ | Bridge to [Google Chat](https://en.wikipedia.org/wiki/Google_Chat) | [Link](docs/configuring-playbook-bridge-mautrix-googlechat.md) |
-| [mautrix-meta](https://github.com/mautrix/instagram) | ❌ | Bridge to [Messenger](https://messenger.com/) and [Instagram](https://instagram.com/) | Link for [Messenger](docs/configuring-playbook-bridge-mautrix-meta-messenger.md) / [Instagram](docs/configuring-playbook-bridge-mautrix-meta-instagram.md) |
+| [mautrix-meta](https://github.com/mautrix/meta) | ❌ | Bridge to [Messenger](https://messenger.com/) and [Instagram](https://instagram.com/) | Link for [Messenger](docs/configuring-playbook-bridge-mautrix-meta-messenger.md) / [Instagram](docs/configuring-playbook-bridge-mautrix-meta-instagram.md) |
 | [mautrix-signal](https://github.com/mautrix/signal) | ❌ | Bridge to [Signal](https://www.signal.org/) | [Link](docs/configuring-playbook-bridge-mautrix-signal.md) |
-| [beeper-linkedin](https://github.com/beeper/linkedin) | ❌ | Bridge to [LinkedIn](https://www.linkedin.com/) | [Link](docs/configuring-playbook-bridge-beeper-linkedin.md) |
+| [beeper-line](https://github.com/beeper/line) | ❌ | Bridge to [LINE](https://line.me/) | [Link](docs/configuring-playbook-bridge-beeper-line.md) |
 | [matrix-appservice-irc](https://github.com/matrix-org/matrix-appservice-irc) | ❌ | Bridge to [IRC](https://wikipedia.org/wiki/Internet_Relay_Chat) | [Link](docs/configuring-playbook-bridge-appservice-irc.md) |
-| [matrix-appservice-kakaotalk](https://src.miscworks.net/fair/matrix-appservice-kakaotalk) | ❌ | Bridge to [Kakaotalk](https://www.kakaocorp.com/page/service/service/KakaoTalk?lang=ENG) | [Link](docs/configuring-playbook-bridge-appservice-kakaotalk.md) |
 | [matrix-appservice-discord](https://github.com/matrix-org/matrix-appservice-discord) | ❌ | Bridge to [Discord](https://discordapp.com/) | [Link](docs/configuring-playbook-bridge-appservice-discord.md) |
 | [matrix-hookshot](https://github.com/matrix-org/matrix-hookshot) | ❌ | Bridge for generic webhooks and multiple project management services, such as GitHub, GitLab, Figma, and Jira in particular | [Link](docs/configuring-playbook-bridge-hookshot.md) |
 | [matrix-sms-bridge](https://github.com/benkuly/matrix-sms-bridge) | ❌ | Bridge to SMS | [Link](docs/configuring-playbook-bridge-matrix-bridge-sms.md) |
 | [matrix-steam-bridge](https://github.com/jasonlaguidice/matrix-steam-bridge) | ❌ | Bridge to [Steam](https://steampowered.com/) | [Link](docs/configuring-playbook-bridge-steam.md) |
 | [matrix-wechat](https://github.com/duo/matrix-wechat) | ❌ | Bridge to [WeChat](https://www.wechat.com/) | [Link](docs/configuring-playbook-bridge-wechat.md) |
 | [Heisenbridge](https://github.com/hifi/heisenbridge) | ❌ | Bouncer-style bridge to [IRC](https://wikipedia.org/wiki/Internet_Relay_Chat) | [Link](docs/configuring-playbook-bridge-heisenbridge.md) |
+| [meshtastic-matrix-relay](https://github.com/jeremiah-k/meshtastic-matrix-relay) | ❌ | Bridge to [Meshtastic](https://meshtastic.org/) mesh networks | [Link](docs/configuring-playbook-bridge-meshtastic-relay.md) |
 | [mx-puppet-groupme](https://gitlab.com/xangelix-pub/matrix/mx-puppet-groupme) | ❌ | Bridge to [GroupMe](https://groupme.com/) | [Link](docs/configuring-playbook-bridge-mx-puppet-groupme.md) |
 | [mx-puppet-steam](https://codeberg.org/icewind/mx-puppet-steam) | ❌ | Bridge to [Steam](https://steamapp.com/) | [Link](docs/configuring-playbook-bridge-mx-puppet-steam.md) |
 | [Postmoogle](https://github.com/etkecc/postmoogle) | ❌ | Email to Matrix bridge | [Link](docs/configuring-playbook-bridge-postmoogle.md) |
@@ -144,11 +147,11 @@ Bots provide various additional functionality to your installation.
 | ---- | -------- | ----------- | ------------- |
 | [baibot](https://github.com/etkecc/baibot) | ❌ | Bot that exposes the power of [AI](https://en.wikipedia.org/wiki/Artificial_intelligence) / [Large Language Models](https://en.wikipedia.org/wiki/Large_language_model) to you | [Link](docs/configuring-playbook-bot-baibot.md) |
 | [matrix-reminder-bot](https://github.com/anoadragon453/matrix-reminder-bot) | ❌ | Bot for scheduling one-off & recurring reminders and alarms | [Link](docs/configuring-playbook-bot-matrix-reminder-bot.md) |
-| [matrix-registration-bot](https://github.com/moan0s/matrix-registration-bot) | ❌ | Bot for invitations by creating and managing registration tokens | [Link](docs/configuring-playbook-bot-matrix-registration-bot.md) |
 | [maubot](https://github.com/maubot/maubot) | ❌ | Plugin-based Matrix bot system | [Link](docs/configuring-playbook-bot-maubot.md) |
 | [Honoroit](https://github.com/etkecc/honoroit) | ❌ | Helpdesk bot | [Link](docs/configuring-playbook-bot-honoroit.md) |
 | [Mjolnir](https://github.com/matrix-org/mjolnir) | ❌ | Moderation tool for Matrix | [Link](docs/configuring-playbook-bot-mjolnir.md) |
 | [Draupnir](https://github.com/the-draupnir-project/Draupnir) | ❌ | Moderation tool for Matrix (Fork of Mjolnir) | [Link](docs/configuring-playbook-bot-draupnir.md) (for [appservice mode](docs/configuring-playbook-appservice-draupnir-for-all.md))|
+| [Meowlnir](https://github.com/maunium/meowlnir) | ❌ | Moderation tool for Matrix, running in appservice mode | [Link](docs/configuring-playbook-bot-meowlnir.md) |
 | [Buscarron](https://github.com/etkecc/buscarron) | ❌ | Web forms (HTTP POST) to Matrix | [Link](docs/configuring-playbook-bot-buscarron.md) |
 
 ### Administration
@@ -159,7 +162,7 @@ Services that help you in administrating and monitoring your Matrix installation
 | ---- | -------- | ----------- | ------------- |
 | [matrix-alertmanager-receiver](https://github.com/metio/matrix-alertmanager-receiver) | ❌ | Prometheus' [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) client | [Link](docs/configuring-playbook-alertmanager-receiver.md) |
 | [Matrix Authentication Service](https://github.com/element-hq/matrix-authentication-service/) | ❌ | OAuth 2.0 and OpenID Provider server | [Link](docs/configuring-playbook-matrix-authentication-service.md) |
-| [synapse-admin](https://github.com/etkecc/synapse-admin) | ❌ | Web UI tool for administrating users and rooms on your Matrix server | [Link](docs/configuring-playbook-synapse-admin.md) |
+| [Ketesa](https://github.com/etkecc/ketesa) | ❌ | Fully-featured web UI for administrating your Matrix homeserver — users, rooms, media, sessions, and more | [Link](docs/configuring-playbook-ketesa.md) |
 | Metrics and Graphs | ❌ | Consists of the [Prometheus](https://prometheus.io) time-series database server, the Prometheus [node-exporter](https://prometheus.io/docs/guides/node-exporter/) host metrics exporter, and the [Grafana](https://grafana.com/) web UI, with [prometheus-nginxlog-exporter](https://github.com/martin-helmich/prometheus-nginxlog-exporter/) being available too | [Link](docs/configuring-playbook-prometheus-grafana.md) (for [prometheus-nginxlog-exporter](docs/configuring-playbook-prometheus-grafana.md#enable-metrics-and-graphs-for-nginx-logs-optional)) |
 | [Borg](https://borgbackup.org) | ❌ | Backups | [Link](docs/configuring-playbook-backup-borg.md) |
 | [rageshake](https://github.com/matrix-org/rageshake) | ❌ | Bug report server | [Link](docs/configuring-playbook-rageshake.md) |

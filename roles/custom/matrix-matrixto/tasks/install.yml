@@ -26,29 +26,38 @@
     - labels
   register: matrix_matrixto_support_files_result
 
+# A checkout owned by a different user (a uid change, an earlier clone by another user, etc.) would make the git task below fail on ownership or permissions.
+- name: Ensure Matrix.to repository ownership is correct on self-build
+  ansible.builtin.file:
+    path: "{{ matrix_matrixto_container_image_self_build_src_files_path }}"
+    state: directory
+    owner: "{{ matrix_user_name }}"
+    group: "{{ matrix_group_name }}"
+    recurse: true
+
 - name: Ensure Matrix.to repository is present on self-build
   ansible.builtin.git:
     repo: "{{ matrix_matrixto_container_image_self_build_repo }}"
     version: "{{ matrix_matrixto_container_image_self_build_repo_version }}"
     dest: "{{ matrix_matrixto_container_image_self_build_src_files_path }}"
     force: "yes"
+  become: true
+  become_user: "{{ matrix_user_name }}"
   register: matrix_matrixto_git_pull_results
 
 - name: Ensure Matrix.to container image is built
-  community.docker.docker_image:
+  community.docker.docker_image_build:
     name: "{{ matrix_matrixto_container_image_self_build_name }}"
-    source: build
-    force_source: "{{ matrix_matrixto_git_pull_results.changed if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
-    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else matrix_matrixto_git_pull_results.changed }}"
-    build:
-      dockerfile: Dockerfile
-      path: "{{ matrix_matrixto_container_image_self_build_src_files_path }}"
-      pull: true
-      args:
+    dockerfile: Dockerfile
+    path: "{{ matrix_matrixto_container_image_self_build_src_files_path }}"
+    pull: true
+    rebuild: "{{ 'always' if matrix_matrixto_git_pull_results.changed | bool else 'never' }}"
   register: matrix_matrixto_container_image_build_result
 
 - name: Ensure Matrix.to container network is created via community.docker.docker_network
-  when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
+  when:
+    - devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
+    - matrix_matrixto_container_network != 'host'
   community.docker.docker_network:
     enable_ipv6: "{{ devture_systemd_docker_base_ipv6_enabled }}"
     name: "{{ matrix_matrixto_container_network }}"
@@ -56,7 +65,9 @@
     driver_options: "{{ devture_systemd_docker_base_container_networks_driver_options }}"
 
 - name: Ensure Matrix.to container network is created via ansible.builtin.command
-  when: devture_systemd_docker_base_container_network_creation_method == 'command'
+  when:
+    - devture_systemd_docker_base_container_network_creation_method == 'command'
+    - matrix_matrixto_container_network != 'host'
   ansible.builtin.command:
     cmd: >-
       {{ devture_systemd_docker_base_host_command_docker }} network create

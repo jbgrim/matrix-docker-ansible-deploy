@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: matrix-docker-ansible-deploy \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-13 10:32+0000\n"
+"POT-Creation-Date: 2026-08-13 05:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,6 +93,18 @@ msgid "Storing your data and managing your presence in the [Matrix](http://matri
 msgstr ""
 
 #: ../../../docs/container-images.md:0
+msgid "[Tuwunel](configuring-playbook-tuwunel.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[matrix-construct/tuwunel](https://ghcr.io/matrix-construct/tuwunel)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Storing your data and managing your presence in the [Matrix](http://matrix.org/) network. Tuwunel is the official successor to conduwuit."
+msgstr ""
+
+#: ../../../docs/container-images.md:0
 msgid "[Dendrite](configuring-playbook-dendrite.md)"
 msgstr ""
 
@@ -104,11 +116,11 @@ msgstr ""
 msgid "Storing your data and managing your presence in the [Matrix](http://matrix.org/) network. Dendrite is a second-generation Matrix homeserver written in Go, an alternative to Synapse."
 msgstr ""
 
-#: ../../../docs/container-images.md:33
+#: ../../../docs/container-images.md:34
 msgid "Clients"
 msgstr ""
 
-#: ../../../docs/container-images.md:35
+#: ../../../docs/container-images.md:36
 msgid "Web clients for Matrix that you can host on your own domains."
 msgstr ""
 
@@ -149,6 +161,14 @@ msgid "Simple, elegant and secure web client"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
+msgid "[Sable](configuring-playbook-client-sable.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[7w1/sable](https://ghcr.io/7w1/sable)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
 msgid "[SchildiChat Web](configuring-playbook-client-schildichat-web.md)"
 msgstr ""
 
@@ -160,11 +180,11 @@ msgstr ""
 msgid "Based on Element Web, with a more traditional instant messaging experience"
 msgstr ""
 
-#: ../../../docs/container-images.md:44
+#: ../../../docs/container-images.md:46
 msgid "Server Components"
 msgstr ""
 
-#: ../../../docs/container-images.md:46
+#: ../../../docs/container-images.md:48
 msgid "Services that run on the server to make the various parts of your installation work."
 msgstr ""
 
@@ -264,11 +284,11 @@ msgstr ""
 msgid "JWT service for integrating [Element Call](./configuring-playbook-element-call.md) with [LiveKit Server](./configuring-playbook-livekit-server.md)"
 msgstr ""
 
-#: ../../../docs/container-images.md:59
+#: ../../../docs/container-images.md:61
 msgid "Authentication"
 msgstr ""
 
-#: ../../../docs/container-images.md:61
+#: ../../../docs/container-images.md:63
 msgid "Extend and modify how users are authenticated on your homeserver."
 msgstr ""
 
@@ -298,30 +318,6 @@ msgstr ""
 
 #: ../../../docs/container-images.md:0
 msgid "LDAP Auth password provider module"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[matrix-ldap-registration-proxy](configuring-playbook-matrix-ldap-registration-proxy.md)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[activism.international/matrix_ldap_registration_proxy](https://gitlab.com/activism.international/matrix_ldap_registration_proxy/container_registry)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "Proxy that handles Matrix registration requests and forwards them to LDAP"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[matrix-registration](configuring-playbook-matrix-registration.md)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[zeratax/matrix-registration](https://hub.docker.com/r/devture/zeratax-matrix-registration/)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "Simple python application to have a token based Matrix registration"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -449,6 +445,30 @@ msgid "Bridge to [Google Messages](https://messages.google.com/)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
+msgid "[mautrix-gvoice](configuring-playbook-bridge-mautrix-gvoice.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[mautrix/gvoice](https://mau.dev/mautrix/gvoice/container_registry)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Bridge to [Google Voice](https://voice.google.com/)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[mautrix-linkedin](configuring-playbook-bridge-mautrix-linkedin.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[mautrix/linkedin](https://mau.dev/mautrix/linkedin/container_registry)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Bridge to [LinkedIn](https://www.linkedin.com/)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
 msgid "[mautrix-whatsapp](configuring-playbook-bridge-mautrix-whatsapp.md)"
 msgstr ""
 
@@ -529,7 +549,15 @@ msgid "[beeper/linkedin](https://ghcr.io/beeper/linkedin)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "Bridge to [LinkedIn](https://www.linkedin.com/)"
+msgid "[beeper-line](configuring-playbook-bridge-beeper-line.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[crispyduck/beeper-line](https://hub.docker.com/r/crispyduck/beeper-line)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Bridge to [LINE](https://line.me/)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -545,18 +573,6 @@ msgid "Bridge to [IRC](https://wikipedia.org/wiki/Internet_Relay_Chat)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "[matrix-appservice-kakaotalk](configuring-playbook-bridge-appservice-kakaotalk.md)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "Self-building"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "Bridge to [Kakaotalk](https://www.kakaocorp.com/page/service/service/KakaoTalk?lang=ENG)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
 msgid "[matrix-appservice-discord](configuring-playbook-bridge-appservice-discord.md)"
 msgstr ""
 
@@ -566,14 +582,6 @@ msgstr ""
 
 #: ../../../docs/container-images.md:0
 msgid "Bridge to [Discord](https://discordapp.com/)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[matrix-appservice-slack](configuring-playbook-bridge-appservice-slack.md)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[matrixdotorg/matrix-appservice-slack](https://hub.docker.com/r/matrixdotorg/matrix-appservice-slack)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -649,6 +657,18 @@ msgid "Bridge to [Steam](https://steampowered.com/)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
+msgid "[matrix-rustpush-bridge](configuring-playbook-bridge-rustpush.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[jasonlaguidice/imessage](https://github.com/jasonlaguidice/imessage/pkgs/container/imessage)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Bridge to [iMessage](https://support.apple.com/messages) via Apple Push Notification service"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
 msgid "[mx-puppet-steam](configuring-playbook-bridge-mx-puppet-steam.md)"
 msgstr ""
 
@@ -672,11 +692,11 @@ msgstr ""
 msgid "Email to Matrix bridge"
 msgstr ""
 
-#: ../../../docs/container-images.md:114
+#: ../../../docs/container-images.md:116
 msgid "Bots"
 msgstr ""
 
-#: ../../../docs/container-images.md:116
+#: ../../../docs/container-images.md:118
 msgid "Bots provide various additional functionality to your installation."
 msgstr ""
 
@@ -702,18 +722,6 @@ msgstr ""
 
 #: ../../../docs/container-images.md:0
 msgid "Bot for scheduling one-off & recurring reminders and alarms"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[matrix-registration-bot](configuring-playbook-bot-matrix-registration-bot.md)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[moanos/matrix-registration-bot](https://hub.docker.com/r/moanos/matrix-registration-bot/)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "Bot for invitations by creating and managing registration tokens"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -765,6 +773,18 @@ msgid "Moderation tool for Matrix (Fork of Mjolnir)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
+msgid "[Meowlnir](configuring-playbook-bot-meowlnir.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[maunium/meowlnir](https://mau.dev/maunium/meowlnir/container_registry)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Moderation tool for Matrix, running in appservice mode"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
 msgid "[Buscarron](configuring-playbook-bot-buscarron.md)"
 msgstr ""
 
@@ -776,11 +796,11 @@ msgstr ""
 msgid "Web forms (HTTP POST) to Matrix"
 msgstr ""
 
-#: ../../../docs/container-images.md:129
+#: ../../../docs/container-images.md:131
 msgid "Administration"
 msgstr ""
 
-#: ../../../docs/container-images.md:131
+#: ../../../docs/container-images.md:133
 msgid "Services that help you in administrating and monitoring your Matrix installation."
 msgstr ""
 
@@ -809,15 +829,15 @@ msgid "OAuth 2.0 and OpenID Provider server"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "[synapse-admin](configuring-playbook-synapse-admin.md)"
+msgid "[Ketesa](configuring-playbook-ketesa.md)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "[etke.cc/synapse-admin](https://ghcr.io/etkecc/synapse-admin)"
+msgid "[etkecc/ketesa](https://ghcr.io/etkecc/ketesa)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "Web UI tool for administrating users and rooms on your Matrix server"
+msgid "Fully-featured web UI for administrating your Matrix homeserver — users, rooms, media, sessions, and more"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -897,23 +917,19 @@ msgid "[synapse-usage-exporter](configuring-playbook-synapse-usage-exporter.md)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
+msgid "Self-building"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
 msgid "Export the usage statistics of a Synapse homeserver to be scraped by Prometheus."
 msgstr ""
 
-#: ../../../docs/container-images.md:147
+#: ../../../docs/container-images.md:149
 msgid "Misc"
 msgstr ""
 
-#: ../../../docs/container-images.md:149
+#: ../../../docs/container-images.md:151
 msgid "Various services that don't fit any other categories."
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "[synapse_auto_accept_invite](configuring-playbook-synapse-auto-accept-invite.md)"
-msgstr ""
-
-#: ../../../docs/container-images.md:0
-msgid "Synapse module to automatically accept invites"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -957,7 +973,7 @@ msgid "[Jitsi](configuring-playbook-jitsi.md)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "[jitsi/web](https://hub.docker.com/r/jitsi/web)"
+msgid "[jitsi/web](https://github.com/jitsi/docker-jitsi-meet/pkgs/container/web)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -965,7 +981,7 @@ msgid "[Jitsi](https://jitsi.org/) web UI"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "[jitsi/jicofo](https://hub.docker.com/r/jitsi/jicofo)"
+msgid "[jitsi/jicofo](https://github.com/jitsi/docker-jitsi-meet/pkgs/container/jicofo)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -973,7 +989,7 @@ msgid "[Jitsi](https://jitsi.org/) Focus component"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "[jitsi/prosody](https://hub.docker.com/r/jitsi/prosody)"
+msgid "[jitsi/prosody](https://github.com/jitsi/docker-jitsi-meet/pkgs/container/prosody)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -981,7 +997,7 @@ msgid "[Jitsi](https://jitsi.org/) Prosody XMPP server component"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
-msgid "[jitsi/jvb](https://hub.docker.com/r/jitsi/jvb)"
+msgid "[jitsi/jvb](https://github.com/jitsi/docker-jitsi-meet/pkgs/container/jvb)"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -1052,11 +1068,11 @@ msgstr ""
 msgid "A native Matrix video conferencing application"
 msgstr ""
 
-#: ../../../docs/container-images.md:168
+#: ../../../docs/container-images.md:169
 msgid "Container images of deprecated / unmaintained services"
 msgstr ""
 
-#: ../../../docs/container-images.md:170
+#: ../../../docs/container-images.md:171
 msgid "The list of the deprecated or unmaintained services is available [here](configuring-playbook.md#deprecated--unmaintained--removed-services)."
 msgstr ""
 
@@ -1121,6 +1137,14 @@ msgid "Matrix Identity Server"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
+msgid "[matrix-appservice-slack](configuring-playbook-bridge-appservice-slack.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[matrixdotorg/matrix-appservice-slack](https://hub.docker.com/r/matrixdotorg/matrix-appservice-slack)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
 msgid "[matrix-appservice-webhooks](configuring-playbook-bridge-appservice-webhooks.md)"
 msgstr ""
 
@@ -1142,6 +1166,42 @@ msgstr ""
 
 #: ../../../docs/container-images.md:0
 msgid "Accessing ChatGPT via your favourite Matrix client"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[matrix-ldap-registration-proxy](configuring-playbook-matrix-ldap-registration-proxy.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[activism.international/matrix_ldap_registration_proxy](https://gitlab.com/activism.international/matrix_ldap_registration_proxy/container_registry)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Proxy that handles Matrix registration requests and forwards them to LDAP"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[matrix-registration](configuring-playbook-matrix-registration.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[zeratax/matrix-registration](https://hub.docker.com/r/devture/zeratax-matrix-registration/)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Simple python application to have a token based Matrix registration"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[matrix-registration-bot](configuring-playbook-bot-matrix-registration-bot.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[moanos/matrix-registration-bot](https://hub.docker.com/r/moanos/matrix-registration-bot/)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Bot for invitations by creating and managing registration tokens"
 msgstr ""
 
 #: ../../../docs/container-images.md:0
@@ -1222,4 +1282,12 @@ msgstr ""
 
 #: ../../../docs/container-images.md:0
 msgid "Sliding Sync support for clients which require it (like old Element X versions, before it got switched to Simplified Sliding Sync)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "[synapse_auto_accept_invite](configuring-playbook-synapse-auto-accept-invite.md)"
+msgstr ""
+
+#: ../../../docs/container-images.md:0
+msgid "Synapse module to automatically accept invites"
 msgstr ""

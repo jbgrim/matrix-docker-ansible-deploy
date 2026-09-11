@@ -1,3 +1,447 @@
+# 2026-08-20
+
+## MatrixRTC transports are advertised in the client well-known again
+
+This only affects you if you have the [Matrix RTC stack](docs/configuring-playbook-matrix-rtc.md) or [Element Call](docs/configuring-playbook-element-call.md) enabled.
+
+Yesterday's changelog entry announced that the `org.matrix.msc4143.rtc_foci` property was gone from the `/.well-known/matrix/client` file. That turned out to be premature and has been reverted, so the property is published again as it always was.
+
+The property is indeed dropped from [MSC4143](https://github.com/matrix-org/matrix-spec-proposals/pull/4143) and [Element Call v0.24.0](https://github.com/element-hq/element-call/releases/tag/v0.24.0) no longer reads it, but Element Web (and likely other clients who move slowly or are otherwise outdated) does not ship that version of Element Call yet. Element Web v1.12.26 bundles Element Call v0.22.0, which still discovers your transport through the well-known property. It cannot use the homeserver's `/_matrix/client/unstable/org.matrix.msc4143/rtc/transports` API instead, because Element Call runs as a widget there and a widget holds no access token, while that API requires authentication. Newer Element Call versions ask their host client for the transports over the widget API ([MSC4515](https://github.com/matrix-org/matrix-spec-proposals/pull/4515)), which is what will eventually make the property unnecessary.
+
+Dropping the property therefore broke Element Call for Element Web and Element Desktop users, with a `MISSING_MATRIX_RTC_TRANSPORT` error when starting a call. Re-running the playbook (`just install-all`) brings the property back and fixes calls.
+
+If you worked around this by publishing the property yourself via `matrix_static_files_file_matrix_client_configuration_extension_json`, you can drop that from your `vars.yml` file now. The `matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_custom` variable and its companions are back as well.
+
+# 2026-08-13
+
+## The homeserver root path redirects to clients other than Element Web
+
+Visiting `https://matrix.example.com/` used to redirect you to [Element Web](docs/configuring-playbook-client-element-web.md), but only if Element Web was the client installed by the playbook. With any of the other web clients (Cinny, Commet, FluffyChat, Hydrogen, SchildiChat, Sable), you would land on a bare Synapse page.
+
+The redirection now follows whichever of these clients you have enabled. When several are enabled, Element Web wins, followed by the others in the order that [`group_vars/matrix_servers`](group_vars/matrix_servers) lists them.
+
+To send people somewhere else (or nowhere at all), define `matrix_playbook_public_client_root_redirection_url` in your `vars.yml` file. An empty value disables the redirection.
+
+## Support for Meowlnir
+
+The playbook can now install [Meowlnir](https://github.com/maunium/meowlnir), an opinionated Matrix moderation bot, optimized for Synapse.
+
+Meowlnir joins [Draupnir](docs/configuring-playbook-bot-draupnir.md) and [Mjolnir](docs/configuring-playbook-bot-mjolnir.md) as a 3rd moderation option, speaking the same [policy list](https://the-draupnir-project.github.io/draupnir-documentation/concepts/policy-lists) protocol so that it can subscribe to the same community ban lists. Unlike the others, it can override individual policies coming from lists you do not control (by way of an unban policy in a list of your own which is ordered ahead of other policy lists).
+
+You can run it alongside Draupnir while evaluating it — see the documentation for the caveats, the main one being that both want the [synapse-http-antispam](https://github.com/maunium/synapse-http-antispam) module, which only reports to a single consumer.
+
+To get started, see the [Setting up Meowlnir](docs/configuring-playbook-bot-meowlnir.md) documentation page.
+
+
+# 2026-08-06
+
+## (Backward Compatibility Break) Jitsi no longer uses Colibri WebSockets
+
+This only affects you if you have [Jitsi](docs/configuring-playbook-jitsi.md) enabled.
+
+Jitsi has been updated to `stable-11146-1`, which [removes Colibri WebSocket support](https://github.com/jitsi/docker-jitsi-meet/pull/2285) in favour of SCTP data channels. The Jitsi Video Bridge no longer serves HTTP at all, so a few `jitsi_jvb_*` variables are gone. The playbook will tell you which ones, if your configuration still sets them.
+
+If you run [additional JVBs on other hosts](https://github.com/mother-of-all-self-hosting/ansible-role-jitsi/blob/main/docs/configuring-jitsi.md#set-up-additional-jvbs-for-more-video-conferences-optional), the Traefik configuration which routed `/colibri-ws/<server-id>/` to them is now dead and can be removed. Nothing will warn you about that one, as it lives in a free-form `traefik_provider_configuration_extension_yaml` block.
+
+# 2026-07-28
+
+## (Backward Compatibility Break) ntfy users are now declared with hashed passwords
+
+This only affects you if you have enabled authentication for [ntfy](docs/configuring-playbook-ntfy.md) via `ntfy_credentials`.
+
+The ntfy role used to create users by invoking `ntfy user` commands against the running container. Since v2.14.0, ntfy can provision users and access-control entries from its own configuration file, so the role now does that instead. Besides being a lot simpler, this fixes passwords containing spaces never arriving intact.
+
+Replace `ntfy_credentials` with `ntfy_auth_users_custom`, which takes bcrypt password hashes rather than plaintext passwords:
+
+```yaml
+ntfy_auth_users_custom:
+  - username: alice
+    password_hash: $2a$10$YLiO8U21sX1uhZamTLJXHuxgVC0Z/GKISibrKCLohPgtG7yIxSk4C
+    role: admin
+```
+
+Generate a hash for each of your passwords by running the following command on any machine which has Docker installed. It asks for the password and prints its hash:
+
+```sh
+docker run --rm -it docker.io/binwiederhier/ntfy:latest user hash
+```
+
+The playbook will let you know if your configuration still uses `ntfy_credentials`.
+
+Your existing ntfy users are left alone and keep working until you declare them again this way. Note that ntfy manages declared users and access-control entries declaratively, so removing one from your configuration later deletes it from ntfy's user database.
+
+Users with the `admin` role get access to all topics. Others start with no access at all, and can be granted access to specific topics via `ntfy_auth_access_custom`. It is also now possible to control what unauthenticated visitors may do (`ntfy_auth_default_access`) and whether users may log in at all (`ntfy_enable_login`, which follows your authentication setup by default). See the role's [documentation on access control](https://github.com/mother-of-all-self-hosting/ansible-role-ntfy/blob/main/docs/configuring-ntfy.md#enable-access-control-with-authentication-optional) for details.
+
+## Support for bridging to LinkedIn via mautrix-linkedin
+
+Thanks to [Aine](https://gitlab.com/etke.cc) of [etke.cc](https://etke.cc/), the playbook now supports bridging to [LinkedIn](https://www.linkedin.com/) via [mautrix-linkedin](https://github.com/mautrix/linkedin).
+
+Logging in requires copying a request out of your browser's developer tools, and only works with Chrome or another Chrome-based browser. To learn more, see our [Setting up Mautrix LinkedIn bridging](./docs/configuring-playbook-bridge-mautrix-linkedin.md) documentation page.
+
+This bridge supersedes [beeper-linkedin](./docs/configuring-playbook-bridge-beeper-linkedin.md), which is now considered unmaintained (its [upstream repository](https://github.com/beeper/linkedin) has been archived). The old bridge remains installable, but you may wish to switch. Both bridges claim the same appservice namespaces, so the playbook refuses to install mautrix-linkedin while beeper-linkedin is still enabled.
+
+## Support for bridging to LINE via beeper-line
+
+Thanks to [Co van Leeuwen](https://github.com/c00), the playbook can now bridge [LINE](https://line.me/) via [beeper-line](https://github.com/beeper/line), a bridge based on the modern mautrix bridge framework. It supports LINE accounts with Letter Sealing enabled or disabled and bridges messages, media, reactions, replies, receipts, and other common chat features.
+
+The bridge identifies itself as a LINE Chrome Extension client, so it cannot be used at the same time as the real LINE Chrome Extension. See [Setting up Beeper LINE bridging](docs/configuring-playbook-bridge-beeper-line.md) to get started.
+
+
+# 2026-07-19
+
+## Tuwunel now exposes its administration and /_tuwunel API paths
+
+The [Tuwunel](docs/configuring-playbook-tuwunel.md) role previously routed only the `/_matrix` path through the reverse proxy. It now also exposes the two other API paths that Tuwunel serves.
+
+The Synapse-compatible administration API (`/_synapse/admin`) powers administration dashboards and moderation bots. As with Synapse and Dendrite, the playbook now exposes it automatically when such a tool is installed: publicly for [Ketesa](docs/configuring-playbook-ketesa.md) or [Element Admin](docs/configuring-playbook-element-admin.md), and on the internal entrypoint for [Draupnir](docs/configuring-playbook-bot-draupnir.md). To expose it yourself, set `matrix_tuwunel_container_labels_public_client_synapse_admin_api_enabled: true` (or the `internal_` variant).
+
+Tuwunel also serves first-party routes under `/_tuwunel`, including its native OpenID Connect provider endpoints, which the reverse proxy must route for OIDC login to work. This path is now routed on the public entrypoint by default. To keep it off the public entrypoint, set `matrix_tuwunel_container_labels_public_tuwunel_api_enabled: false`.
+
+
+# 2026-07-18
+
+## LiveKit Server port configuration must be unambiguous now
+
+This only affects you if you have configured a LiveKit Server RTC port range (`livekit_server_config_rtc_port_range_start` and `livekit_server_config_rtc_port_range_end`).
+
+LiveKit only uses one of the two port configuration mechanisms: when a port range is defined, the multiplexed UDP port (`livekit_server_config_rtc_udp_port`) is ignored entirely. Previously, the role would silently render its default UDP port (7882) into the configuration alongside your port range, misleadingly suggesting that both are in effect.
+
+The role now asks you to make the choice explicit: if you define a port range, unset the UDP port by adding `livekit_server_config_rtc_udp_port: ''` to your `vars.yml` file. A validation error will guide you, if your configuration is affected.
+
+
+# 2026-07-17
+
+## prometheus-nginxlog-exporter metric names have changed
+
+If you have enabled [metrics for nginx logs](docs/configuring-playbook-prometheus-grafana.md) (`prometheus_nginxlog_exporter_enabled: true`), note that the exporter's metric names have changed.
+
+The exporter's configuration used to ship a leftover `myprefix` placeholder as the metric name prefix, producing metrics like `myprefix_http_response_count_total`. The bundled Grafana dashboard queries unprefixed metric names (`http_response_count_total`), so it could never show any data (reported in [#3380](https://github.com/spantaleev/matrix-docker-ansible-deploy/issues/3380)).
+
+Metric names are now unprefixed, matching the bundled dashboard, which should start working. Each metric carries a `namespace` label, whose value is now `nginx` (previously `matrix`); it is configurable via `prometheus_nginxlog_exporter_config_namespace_name`. If you have built custom dashboards or alerts on top of the old `myprefix_*` metric names, adjust them accordingly, or restore the old behavior by setting `prometheus_nginxlog_exporter_config_namespace_metrics_prefix: myprefix` in your `vars.yml` file.
+
+
+# 2026-07-16
+
+## (Backward Compatibility Break) Bridge variables have been renamed
+
+All bridge roles (`roles/custom/matrix-bridge-*`) now use a uniform variable naming scheme, where the variable prefix matches the role directory name. This adopts the naming policy proposed in [#4705](https://github.com/spantaleev/matrix-docker-ansible-deploy/issues/4705) and requested in [#5096](https://github.com/spantaleev/matrix-docker-ansible-deploy/issues/5096).
+
+Previously, bridge variable prefixes were all over the place (`matrix_mautrix_telegram_*`, `matrix_heisenbridge_*`, `matrix_steam_bridge_*`, etc.). Now, they all follow the same pattern that bot roles (`matrix_bot_<name>_*`) have been using for years: the `matrix-bridge-mautrix-telegram` role uses `matrix_bridge_mautrix_telegram_*` variables, the `matrix-bridge-steam` role uses `matrix_bridge_steam_*` variables, and so on.
+
+Only Ansible variables were renamed. Systemd service names, container names, `/matrix/*` directories, database names and usernames, and appservice registration contents (tokens, bot usernames) all remain the same. No data migration is necessary and bridges keep working as before, once you rename the variables in your `vars.yml` configuration file.
+
+The playbook will let you know if your configuration still uses old-style variable names.
+
+Here is the full rename map:
+
+| Old variable prefix | New variable prefix |
+|---------------------|---------------------|
+| `matrix_appservice_discord_` | `matrix_bridge_appservice_discord_` |
+| `matrix_appservice_irc_` | `matrix_bridge_appservice_irc_` |
+| `matrix_beeper_linkedin_` | `matrix_bridge_beeper_linkedin_` |
+| `matrix_heisenbridge_` | `matrix_bridge_heisenbridge_` |
+| `matrix_hookshot_` | `matrix_bridge_hookshot_` |
+| `matrix_mautrix_androidsms_` | `matrix_bridge_mautrix_wsproxy_androidsms_` |
+| `matrix_mautrix_bluesky_` | `matrix_bridge_mautrix_bluesky_` |
+| `matrix_mautrix_discord_` | `matrix_bridge_mautrix_discord_` |
+| `matrix_mautrix_gmessages_` | `matrix_bridge_mautrix_gmessages_` |
+| `matrix_mautrix_googlechat_` | `matrix_bridge_mautrix_googlechat_` |
+| `matrix_mautrix_gvoice_` | `matrix_bridge_mautrix_gvoice_` |
+| `matrix_mautrix_imessage_` | `matrix_bridge_mautrix_wsproxy_imessage_` |
+| `matrix_mautrix_meta_instagram_` | `matrix_bridge_mautrix_meta_instagram_` |
+| `matrix_mautrix_meta_messenger_` | `matrix_bridge_mautrix_meta_messenger_` |
+| `matrix_mautrix_signal_` | `matrix_bridge_mautrix_signal_` |
+| `matrix_mautrix_slack_` | `matrix_bridge_mautrix_slack_` |
+| `matrix_mautrix_telegram_` | `matrix_bridge_mautrix_telegram_` |
+| `matrix_mautrix_twitter_` | `matrix_bridge_mautrix_twitter_` |
+| `matrix_mautrix_whatsapp_` | `matrix_bridge_mautrix_whatsapp_` |
+| `matrix_mautrix_wsproxy_` | `matrix_bridge_mautrix_wsproxy_` |
+| `matrix_meshtastic_relay_` | `matrix_bridge_meshtastic_relay_` |
+| `matrix_mx_puppet_groupme_` | `matrix_bridge_mx_puppet_groupme_` |
+| `matrix_mx_puppet_steam_` | `matrix_bridge_mx_puppet_steam_` |
+| `matrix_postmoogle_` | `matrix_bridge_postmoogle_` |
+| `matrix_rustpush_bridge_` | `matrix_bridge_rustpush_` |
+| `matrix_sms_bridge_` | `matrix_bridge_sms_` |
+| `matrix_steam_bridge_` | `matrix_bridge_steam_` |
+| `matrix_wechat_` | `matrix_bridge_wechat_` |
+
+A few special cases beyond the prefix map:
+
+- `matrix_mautrix_signal_wsproxy_syncproxy_connection_string` (a variable of the mautrix-wsproxy role, despite its name) is now `matrix_bridge_mautrix_wsproxy_syncproxy_connection_string`
+- `matrix_playbook_migration_matrix_postmoogle_migration_validation_enabled` is now `matrix_playbook_migration_matrix_bridge_postmoogle_migration_validation_enabled`
+
+You can update your `vars.yml` file automatically with this `sed` command (on macOS, use `sed -i ''` instead of `sed -i`):
+
+```sh
+sed -i \
+  -e 's/matrix_appservice_discord_/matrix_bridge_appservice_discord_/g' \
+  -e 's/matrix_appservice_irc_/matrix_bridge_appservice_irc_/g' \
+  -e 's/matrix_beeper_linkedin_/matrix_bridge_beeper_linkedin_/g' \
+  -e 's/matrix_heisenbridge_/matrix_bridge_heisenbridge_/g' \
+  -e 's/matrix_hookshot_/matrix_bridge_hookshot_/g' \
+  -e 's/matrix_mautrix_androidsms_/matrix_bridge_mautrix_wsproxy_androidsms_/g' \
+  -e 's/matrix_mautrix_bluesky_/matrix_bridge_mautrix_bluesky_/g' \
+  -e 's/matrix_mautrix_discord_/matrix_bridge_mautrix_discord_/g' \
+  -e 's/matrix_mautrix_gmessages_/matrix_bridge_mautrix_gmessages_/g' \
+  -e 's/matrix_mautrix_googlechat_/matrix_bridge_mautrix_googlechat_/g' \
+  -e 's/matrix_mautrix_gvoice_/matrix_bridge_mautrix_gvoice_/g' \
+  -e 's/matrix_mautrix_imessage_/matrix_bridge_mautrix_wsproxy_imessage_/g' \
+  -e 's/matrix_mautrix_meta_instagram_/matrix_bridge_mautrix_meta_instagram_/g' \
+  -e 's/matrix_mautrix_meta_messenger_/matrix_bridge_mautrix_meta_messenger_/g' \
+  -e 's/matrix_mautrix_signal_wsproxy_syncproxy_connection_string/matrix_bridge_mautrix_wsproxy_syncproxy_connection_string/g' \
+  -e 's/matrix_mautrix_signal_/matrix_bridge_mautrix_signal_/g' \
+  -e 's/matrix_mautrix_slack_/matrix_bridge_mautrix_slack_/g' \
+  -e 's/matrix_mautrix_telegram_/matrix_bridge_mautrix_telegram_/g' \
+  -e 's/matrix_mautrix_twitter_/matrix_bridge_mautrix_twitter_/g' \
+  -e 's/matrix_mautrix_whatsapp_/matrix_bridge_mautrix_whatsapp_/g' \
+  -e 's/matrix_mautrix_wsproxy_/matrix_bridge_mautrix_wsproxy_/g' \
+  -e 's/matrix_meshtastic_relay_/matrix_bridge_meshtastic_relay_/g' \
+  -e 's/matrix_mx_puppet_groupme_/matrix_bridge_mx_puppet_groupme_/g' \
+  -e 's/matrix_mx_puppet_steam_/matrix_bridge_mx_puppet_steam_/g' \
+  -e 's/matrix_postmoogle_/matrix_bridge_postmoogle_/g' \
+  -e 's/matrix_rustpush_bridge_/matrix_bridge_rustpush_/g' \
+  -e 's/matrix_sms_bridge_/matrix_bridge_sms_/g' \
+  -e 's/matrix_steam_bridge_/matrix_bridge_steam_/g' \
+  -e 's/matrix_wechat_/matrix_bridge_wechat_/g' \
+  -e 's/matrix_playbook_migration_matrix_postmoogle_migration_validation_enabled/matrix_playbook_migration_matrix_bridge_postmoogle_migration_validation_enabled/g' \
+  vars.yml
+```
+
+The `sed` command only replaces prefixes followed by an underscore, so values that intentionally match old prefixes (like the default database names, e.g. `matrix_mautrix_telegram`) are not affected.
+
+**Note**: if you have defined your own custom variables whose names embed an old prefix (e.g. `vault_matrix_postmoogle_password` referencing a secret in an Ansible Vault file), the `sed` command renames such references too. Either rename your custom variables to match (including their definitions in encrypted vault files, which `sed` cannot reach), or revert those spots manually.
+
+# 2026-07-15
+
+## Google Voice bridging
+
+The playbook can now bridge [Google Voice](https://voice.google.com/) via the [mautrix-gvoice](https://github.com/mautrix/gvoice) bridge. Text and media flow both ways, and portal rooms build themselves for your recent conversations.
+
+Login is by cookie, not a paired phone: you copy the cookies from a browser signed in to voice.google.com and hand them to the bot. Google expires them on its own schedule, so expect to log in again every so often. See [Setting up Mautrix Google Voice bridging](./docs/configuring-playbook-bridge-mautrix-gvoice.md) to get started.
+
+## matrix-appservice-kakaotalk has been removed from the playbook
+
+The [matrix-appservice-kakaotalk](./docs/configuring-playbook-bridge-appservice-kakaotalk.md) bridge has been removed from the playbook. This component could only be installed by self-building its source code, and its upstream repository has become unreachable, which makes installation impossible. The bridge was also based on the unmaintained node-kakao library, and there have been reports that using it may get KakaoTalk accounts banned.
+
+The playbook will let you know if you're using any `matrix_appservice_kakaotalk_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the component manually](./docs/configuring-playbook-bridge-appservice-kakaotalk.md#uninstalling-the-component-manually).
+
+## Dedicated CAPTCHA variables for Matrix Authentication Service
+
+[Matrix Authentication Service](./docs/configuring-playbook-matrix-authentication-service.md) can now be protected with CAPTCHA (ReCaptcha v2, Cloudflare Turnstile, or hCaptcha) via dedicated variables, instead of going through `matrix_authentication_service_configuration_extension_yaml`. See the [captcha documentation](./docs/configuring-captcha.md#matrix-authentication-service) for details.
+
+# 2026-07-14
+
+## The playbook no longer ships a custom welcome page for Element Web
+
+Element Web [redesigned its welcome page](https://github.com/element-hq/element-web/pull/33211) (the screen shown at `/#/welcome` before logging in) into a built-in component and no longer loads a custom `welcome.html` file by default. Since the playbook upgraded to an Element Web version containing that change (spring 2026), the custom welcome page the playbook installed (and the variables customizing it) had silently stopped having any effect.
+
+The playbook now embraces the new upstream behavior and no longer ships its own `welcome.html`. The following variables have been removed and the playbook will let you know if you're still using them: `matrix_client_element_welcome_headline`, `matrix_client_element_welcome_text`, `matrix_client_element_welcome_logo_link` and `matrix_client_element_page_template_welcome_path`.
+
+Most welcome page customizations keep working, because they go through Element Web's branding configuration, which the new welcome page still honors:
+
+- a custom logo, via `matrix_client_element_welcome_logo` (or `matrix_client_element_branding_auth_header_logo_url`)
+- a custom background, via `matrix_client_element_branding_welcome_background_url`
+
+If you need a fully custom welcome page, you can self-host an HTML page and point Element Web at it, like this:
+
+```yaml
+matrix_client_element_configuration_extension_json: |
+  {
+    "embedded_pages": {
+      "welcome_url": "https://example.com/my-welcome.html"
+    }
+  }
+```
+
+## BorgBackup now includes Synapse's local thumbnails
+
+For Synapse servers, the built-in [BorgBackup](./docs/configuring-playbook-backup-borg.md) integration no longer excludes the media store's `local_thumbnails` directory from backups.
+
+Synapse only generates thumbnails of local media at upload time (unless `dynamic_thumbnails` is enabled, which the playbook does not do), and there is no tooling to regenerate them. Restoring a backup made with the previous exclusion list therefore left all previously uploaded local images without thumbnails. The [official Synapse backup guide](https://element-hq.github.io/synapse/latest/usage/administration/backups.html) recommends backing this directory up, and the playbook now follows that recommendation.
+
+Expect your backups to grow somewhat, depending on how much image media your local users have uploaded. If you prefer the old behavior, you can redefine `backup_borg_location_exclude_patterns` in your `vars.yml`.
+
+# 2026-07-12
+
+## matrix-registration-bot has been removed from the playbook
+
+The [matrix-registration-bot](./docs/configuring-playbook-bot-matrix-registration-bot.md) service has been removed from the playbook, as it has been unmaintained.
+
+The playbook will let you know if you're using any `matrix_bot_matrix_registration_bot_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the component manually](./docs/configuring-playbook-bot-matrix-registration-bot.md#uninstalling-the-component-manually).
+
+## Continuwuity v26 no longer supports LDAP
+
+The playbook now installs [Continuwuity](./docs/configuring-playbook-continuwuity.md) v26, a major upgrade from the v0.5.x series which **removes LDAP authentication support** (see the [v26.6.0 release notes](https://forgejo.ellis.link/continuwuation/continuwuity/releases/tag/v26.6.0)).
+
+The playbook never exposed dedicated variables for Continuwuity's LDAP support, so most people are unaffected. However, if you had enabled LDAP via `matrix_continuwuity_environment_variables_extension` or a custom configuration template, you'll need to migrate to another authentication method, such as the newly introduced [OpenID Connect support](https://continuwuity.org/guides/oidc).
+
+# 2026-06-29
+
+## Support for running on Synology DSM
+
+Thanks to [cksit](https://github.com/cksit), the playbook can now run on [Synology DSM](https://www.synology.com/dsm) 7 and later.
+
+Synology hosts are detected automatically (via `/etc/synoinfo.conf`), so other systems are unaffected. On DSM, the playbook uses the platform's native user management (`synouser`/`synogroup`), works around a Docker SDK incompatibility, and installs a small boot-fix service that handles a few DSM-specific boot quirks.
+
+To get started, see the new [Configuring Synology DSM](./docs/configuring-playbook-synology.md) documentation page.
+
+## Mautrix bridges now expose their API (for Mautrix Manager and similar tools)
+
+The playbook now exposes the HTTP API of each [mautrix](https://github.com/mautrix) bridge, so tools like [Mautrix Manager](https://github.com/mautrix/manager) can help you log into them. This is especially useful for [mautrix-gmessages](./docs/configuring-playbook-bridge-mautrix-gmessages.md): Google has removed its QR-code login, leaving a [manual cookie-extraction flow](https://docs.mau.fi/bridges/go/gmessages/authentication.html) that tools like Mautrix Manager can streamline.
+
+The API is exposed at `https://matrix.example.com/bridges/SERVICENAME` (for example, `https://matrix.example.com/bridges/gmessages`) and is advertised via a new `/.well-known/matrix/mautrix` file, so compatible tools can discover your bridges automatically. Such tools authenticate with your own Matrix access token, so no bridge secret needs to be shared with them.
+
+This affects all mautrix bridges based on the new bridge framework (bluesky, gmessages, meta-instagram, meta-messenger, signal, slack, telegram, twitter and whatsapp) and is enabled by default.
+
+To learn more (including how to turn it off), see the [Expose the bridge's API](./docs/configuring-playbook-bridge-mautrix-bridges.md#expose-the-bridges-api-for-mautrix-manager-and-similar-tools) section on our common mautrix bridges documentation page.
+
+# 2026-06-28
+
+## baibot now supports Venice, our recommended provider
+
+[baibot](./docs/configuring-playbook-bot-baibot.md) now ships a preset for the [Venice](./docs/configuring-playbook-bot-baibot.md#venice) provider, and it's the one we recommend. It's the most capable provider baibot supports (text generation with vision, file inputs and web search, speech-to-text, text-to-speech, and image generation and editing), and the only one that runs inference with no logging and no training on your data.
+
+Enabling it takes a preset toggle and an API key:
+
+```yaml
+matrix_bot_baibot_config_agents_static_definitions_venice_enabled: true
+
+matrix_bot_baibot_config_agents_static_definitions_venice_config_api_key: "YOUR_API_KEY_HERE"
+```
+
+[OpenAI](https://openai.com/) and baibot's other providers remain fully supported. To get started, see the [Setting up baibot](./docs/configuring-playbook-bot-baibot.md#venice) documentation page.
+
+# 2026-06-24
+
+## Support for bridging to iMessage via RustPush
+
+Thanks to [jasonlaguidice](https://github.com/jasonlaguidice), the playbook now supports bridging to [iMessage](https://support.apple.com/messages) via a new [RustPush](https://github.com/OpenBubbles/rustpush)-based bridge ([jasonlaguidice/imessage](https://github.com/jasonlaguidice/imessage)).
+
+Unlike the existing [mautrix-wsproxy](./docs/configuring-playbook-bridge-mautrix-wsproxy.md) iMessage bridge, this one talks directly to Apple's push notification service, so it needs neither a running Mac nor a wsproxy on the homeserver. Each user supplies a hardware key extracted from a Mac through the bridge bot's login flow.
+
+To learn more, see our [Setting up RustPush (iMessage) bridging](./docs/configuring-playbook-bridge-rustpush.md) documentation page.
+
+# 2026-05-24
+
+## matrix-ldap-registration-proxy has been removed from the playbook
+
+The [matrix-ldap-registration-proxy](./docs/configuring-playbook-matrix-ldap-registration-proxy.md) service has been removed from the playbook, as the source code and the container image have become unavailable.
+
+The playbook will let you know if you're using any `matrix_ldap_registration_proxy_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the component manually](./docs/configuring-playbook-matrix-ldap-registration-proxy.md#uninstalling-the-component-manually).
+
+# 2026-05-23
+
+## Go-NEB has been removed from the playbook
+
+[Go-NEB](./docs/configuring-playbook-bot-go-neb.md) has been removed from the playbook, as it has been discontinued since June 2023.
+
+The playbook will let you know if you're using any `matrix_bot_go_neb_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the bot manually](./docs/configuring-playbook-bot-go-neb.md#uninstalling-go-neb-manually).
+
+# 2026-05-19
+
+## matrix-registration has been removed from the playbook
+
+The [matrix-registration](./docs/configuring-playbook-matrix-registration.md) service has been removed from the playbook, as it has been unmaintained (archived) since November, 2025.
+
+The playbook will let you know if you're using any `matrix_registration_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the component manually](./docs/configuring-playbook-matrix-registration.md#uninstalling-the-component-manually).
+
+# 2026-05-18
+
+## LiveKit Server has been upgraded to v1.12.0
+
+The playbook now ships [LiveKit Server](./docs/configuring-playbook-livekit-server.md) v1.12.0. See the [upstream release notes](https://github.com/livekit/livekit/releases/tag/v1.12.0) for details.
+
+This release tightens TURN security:
+
+- **TURN credentials now carry a TTL** (default: 300 seconds), exposed via `livekit_server_config_turn_ttl_seconds`.
+- **TURN no longer relays traffic to restricted peer CIDRs** (loopback, link-local, multicast, private, unspecified) by default. If your setup legitimately requires it, list the ranges in `livekit_server_config_turn_allow_restricted_peer_cidrs`.
+
+    For example, to allow TURN to reach the common [RFC1918](https://www.rfc-editor.org/rfc/rfc1918) private ranges, add to your `vars.yml`:
+    ```yaml
+    livekit_server_config_turn_allow_restricted_peer_cidrs:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+    ```
+
+    Adjust the ranges to match your network. To deny specific CIDRs (taking precedence over the allow list above), use `livekit_server_config_turn_deny_peer_cidrs` in the same shape.
+
+
+# 2026-05-07
+
+## Tuwunel support
+
+Thanks to [Jason Volk](https://github.com/jevolk), the playbook now supports the [Tuwunel](./docs/configuring-playbook-tuwunel.md) homeserver as an optional alternative to Synapse.
+
+Tuwunel is a fork of [conduwuit](./docs/configuring-playbook-conduwuit.md) written in Rust. The former conduwuit maintainer [endorses Tuwunel as conduwuit's successor](https://github.com/spantaleev/matrix-docker-ansible-deploy/pull/5200#issuecomment-4396211185). Like [Continuwuity](./docs/configuring-playbook-continuwuity.md), Tuwunel continues development on top of conduwuit's database format.
+
+Existing installations do **not** need to be updated. **Synapse is still the default homeserver implementation** installed by the playbook.
+
+People that used to run conduwuit may wish to [migrate from conduwuit to Tuwunel](./docs/configuring-playbook-tuwunel.md#migrating-from-conduwuit) via the new `tuwunel-migrate-from-conduwuit` tag, which performs an in-place binary-swap migration that reads the conduwuit database directly.
+
+**The homeserver implementation of an existing server cannot be changed** (e.g. from Synapse/Conduit/Dendrite/Continuwuity to Tuwunel) without data loss. The exception is conduwuit, due to the shared database format.
+
+
+# 2026-04-24
+
+## Support for bridging to Meshtastic via meshtastic-matrix-relay
+
+Thanks to [luschmar](https://github.com/luschmar), the playbook now supports bridging to [Meshtastic](https://meshtastic.org/) mesh networks via [meshtastic-matrix-relay](https://github.com/jeremiah-k/meshtastic-matrix-relay) (mmrelay).
+
+To learn more, see our [Setting up a Matrix <-> Meshtastic bridge](./docs/configuring-playbook-bridge-meshtastic-relay.md) documentation page.
+
+## (BC Break) mautrix-telegram has been rewritten in Go (bridgev2)
+
+The [mautrix-telegram](./docs/configuring-playbook-bridge-mautrix-telegram.md) bridge has been [rewritten in Go](https://mau.fi/blog/2026-04-mautrix-release/) on top of the [bridgev2](https://docs.mau.fi/bridges/go/) architecture. See the [upstream v26.04 release notes](https://github.com/mautrix/telegram/releases/tag/v0.2604.0) for what changed in the bridge itself (shared-portal behavior, management-room state, new features, etc.).
+
+**Most users won't have to do anything.** If you use the playbook's integrated Postgres (the default) and haven't customized telegram-bridge variables beyond `matrix_mautrix_telegram_api_id` and `matrix_mautrix_telegram_api_hash`, just re-run the playbook; the bridge will migrate itself on first start. Taking a backup beforehand is still a good idea.
+
+⚠️ **SQLite users: do not upgrade yet.** Upstream v0.2604.0 has a [known bug in the legacy SQLite migration](https://github.com/mautrix/telegram/releases/tag/v0.2604.0) that can corrupt your data. The playbook detects this case and will refuse to proceed. Either switch to Postgres first (set `matrix_mautrix_telegram_database_engine: postgres`; the playbook handles the pgloader migration), or wait for the next upstream release.
+
+Playbook-specific things to know. The playbook will fail loudly if you're affected:
+
+- Many `matrix_mautrix_telegram_*` variables have been **removed** (web-login endpoint, lottieconverter, username/alias/displayname templates, filter-mode, bot-token relaybot, Shared-Secret-Auth map). The deprecation check will tell you exactly what to rename or drop when you run the playbook.
+- **Old-style relaybot users** (`matrix_mautrix_telegram_bot_token`): switch to the common [mautrix bridge relay mode](./docs/configuring-playbook-bridge-mautrix-bridges.md#enable-relay-mode-optional) via `matrix_mautrix_telegram_bridge_relay_enabled: true`.
+- **Shared-Secret-Auth double-puppeting users**: switch to [Appservice Double Puppet](./docs/configuring-playbook-appservice-double-puppet.md); the playbook wires it up automatically.
+- **Custom `matrix_mautrix_telegram_bridge_permissions`**: map `relaybot` to `relay`, `puppeting` to `user`, `full` to `user`. Validated at playbook time.
+
+# 2026-04-03
+
+## (BC Break) Synapse Admin (fork by etke.cc) is now Ketesa
+
+Synapse Admin has been rebranded to **[Ketesa](https://github.com/etkecc/ketesa)** — a landmark release that introduces a new identity, a full UI redesign, mobile-first layout, and deep Matrix Authentication Service (MAS) integration. For the full story behind the rename and a tour of what's new, see the [Ketesa v1.0.0 announcement](https://etke.cc/blog/introducing-ketesa/).
+
+Ketesa is a zero-configuration drop-in replacement for Synapse Admin: no server-side changes required, just update the role variables.
+
+The `matrix-synapse-admin` role has been **renamed** to `matrix-ketesa`. All `matrix_synapse_admin_*` variables must be **renamed** to `matrix_ketesa_*` in your `vars.yml`.
+
+Additionally, the **Docker image** changed from `ghcr.io/etkecc/synapse-admin` to `ghcr.io/etkecc/ketesa`. The default path prefix remains `/synapse-admin` for backward compatibility — updating to `/ketesa` is recommended but not required.
+
+The playbook will automatically detect leftover `matrix_synapse_admin_*` variables and fail with a helpful message listing what needs to be renamed.
+
+The playbook handles reverse-proxy routing for subpath deployments (e.g. `/ketesa`), including MAS-enabled setups — though OIDC auth flows on real servers still have some rough edges. Feedback is appreciated in [#ketesa:etke.cc](https://matrix.to/#/#ketesa:etke.cc).
+
+See the [Ketesa documentation](docs/configuring-playbook-ketesa.md) for details.
+
+# 2026-04-02
+
+## (BC Break) Draupnir for all Self Service Provisioning is now disabled by default
+
+💡 If you don't use [Draupnir for all](./docs/configuring-playbook-appservice-draupnir-for-all.md), then this breaking change does not concern you..
+
+[Draupnir for all](./docs/configuring-playbook-appservice-draupnir-for-all.md) now ships with `allowSelfServiceProvisioning: false` as default upstream and in this playbook.
+
+This means users can no longer provision Draupnir instances by inviting the appservice bot unless you explicitly opt in.
+
+Manual provisioning by administrators is now the recommended approach. You do not want to enable Self Service Provisioning unless you have additional custom safeguards like those used by asgard.chat in place.
+
+If you want to enable Self Service Provisioning, add the following to your `vars.yml`:
+
+```yaml
+matrix_appservice_draupnir_for_all_configuration_extension_yaml: |
+  allowSelfServiceProvisioning: true
+```
+
 # 2026-03-23
 
 ## Migration validation system introduced

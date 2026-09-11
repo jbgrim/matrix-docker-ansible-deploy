@@ -16,7 +16,7 @@ matrix_synapse_enabled: true
 matrix_synapse_github_org_and_repo: element-hq/synapse
 
 # renovate: datasource=docker depName=ghcr.io/element-hq/synapse
-matrix_synapse_version: v1.150.0
+matrix_synapse_version: v1.160.0
 
 matrix_synapse_username: ''
 matrix_synapse_uid: ''
@@ -86,7 +86,6 @@ matrix_synapse_container_image_customizations_dockerfile_body_custom: ''
 matrix_synapse_container_image: "{{ matrix_synapse_container_image_registry_prefix }}{{ matrix_synapse_container_image_name }}:{{ matrix_synapse_container_image_tag }}"
 matrix_synapse_container_image_name: "{{ matrix_synapse_github_org_and_repo }}"
 matrix_synapse_container_image_tag: "{{ matrix_synapse_version }}"
-matrix_synapse_container_image_force_pull: "{{ matrix_synapse_container_image.endswith(':latest') }}"
 matrix_synapse_container_image_registry_prefix: "{{ 'localhost/' if matrix_synapse_container_image_self_build else matrix_synapse_container_image_registry_prefix_upstream }}"
 matrix_synapse_container_image_registry_prefix_upstream: "{{ matrix_synapse_container_image_registry_prefix_upstream_default }}"
 matrix_synapse_container_image_registry_prefix_upstream_default: "ghcr.io/"
@@ -538,7 +537,7 @@ matrix_synapse_federation_rr_transactions_per_room_per_second: 50
 
 # Controls the rate limit for delayed event management.
 #
-# This is only applied if `matrix_synapse_experimental_features_msc4140_enabled` is set to `true`.
+# This is only applied if `matrix_synapse_delayed_events_enabled` is set to `true`.
 matrix_synapse_rc_delayed_event_mgmt:
   per_second: 1
   burst_count: 20
@@ -574,7 +573,10 @@ matrix_synapse_federation_listener_resource_names: "{{ ['federation'] if matrix_
 matrix_synapse_report_stats: false
 
 # The endpoint to report homeserver usage statistics to.
-matrix_synapse_report_stats_endpoint: "https://matrix.org/report-usage-stats/push"
+matrix_synapse_report_stats_endpoint: "{{ matrix_synapse_report_stats_endpoint_default }}"
+
+# The default endpoint to report homeserver usage statistics to (the one operated by matrix.org).
+matrix_synapse_report_stats_endpoint_default: "https://matrix.org/report-usage-stats/push"
 
 # Controls whether the Matrix server will track presence status (online, offline, unavailable) for users.
 # If users participate in large rooms with many other servers,
@@ -950,6 +952,7 @@ matrix_synapse_workers_presets:
     # Keep disabled by default: MSC4306/4308 thread subscriptions are unstable
     # and disabled in upstream Synapse unless explicitly opted in.
     stream_writer_thread_subscriptions_stream_workers_count: 0
+    stream_writer_quarantined_media_changes_stream_workers_count: 0
   one-of-each:
     room_workers_count: 0
     sync_workers_count: 0
@@ -973,6 +976,7 @@ matrix_synapse_workers_presets:
     # Keep disabled by default: MSC4306/4308 thread subscriptions are unstable
     # and disabled in upstream Synapse unless explicitly opted in.
     stream_writer_thread_subscriptions_stream_workers_count: 0
+    stream_writer_quarantined_media_changes_stream_workers_count: 1
   specialized-workers:
     room_workers_count: 1
     sync_workers_count: 1
@@ -996,6 +1000,7 @@ matrix_synapse_workers_presets:
     # Keep disabled by default: MSC4306/4308 thread subscriptions are unstable
     # and disabled in upstream Synapse unless explicitly opted in.
     stream_writer_thread_subscriptions_stream_workers_count: 0
+    stream_writer_quarantined_media_changes_stream_workers_count: 1
 
 # Controls whether the matrix-synapse container exposes the various worker ports
 # (see `port` and `metrics_port` in `matrix_synapse_workers_enabled_list`) outside of the container.
@@ -1102,6 +1107,10 @@ matrix_synapse_workers_stream_writer_device_lists_stream_workers_count: "{{ matr
 # More than 1 worker is also supported of this type.
 matrix_synapse_workers_stream_writer_thread_subscriptions_stream_workers_count: "{{ matrix_synapse_workers_presets[matrix_synapse_workers_preset]['stream_writer_thread_subscriptions_stream_workers_count'] }}"
 
+# matrix_synapse_workers_stream_writer_quarantined_media_changes_stream_workers_count controls how many stream writers that handle the `quarantined_media_changes` stream to spawn.
+# More than 1 worker is also supported of this type.
+matrix_synapse_workers_stream_writer_quarantined_media_changes_stream_workers_count: "{{ matrix_synapse_workers_presets[matrix_synapse_workers_preset]['stream_writer_quarantined_media_changes_stream_workers_count'] }}"
+
 # A list of stream writer workers to enable. This list is built automatically based on other variables.
 # You're encouraged to enable/disable stream writer workers by setting `matrix_synapse_workers_stream_writer_*_stream_workers_count` variables, instead of adjusting this list manually.
 matrix_synapse_workers_stream_writers: |
@@ -1125,6 +1134,8 @@ matrix_synapse_workers_stream_writers: |
     ([{'stream': 'device_lists'}] * matrix_synapse_workers_stream_writer_device_lists_stream_workers_count | int)
     +
     ([{'stream': 'thread_subscriptions'}] * matrix_synapse_workers_stream_writer_thread_subscriptions_stream_workers_count | int)
+    +
+    ([{'stream': 'quarantined_media_changes'}] * matrix_synapse_workers_stream_writer_quarantined_media_changes_stream_workers_count | int)
   }}
 
 matrix_synapse_workers_stream_writers_container_arguments: []
@@ -1231,6 +1242,25 @@ matrix_synapse_workers_background_workers_container_arguments: []
 # `run_background_tasks_on` is meant to point to a worker, which is dedicated to processing background tasks.
 matrix_synapse_run_background_tasks_on: "{{ (matrix_synapse_workers_enabled_list | selectattr('type', 'equalto', 'background') | list)[0].name if (matrix_synapse_workers_enabled and matrix_synapse_workers_enabled_list | selectattr('type', 'equalto', 'background') | list | length > 0) else '' }}"
 
+# matrix_synapse_workers_total_count reflects the total number of Synapse worker processes that the `matrix_synapse_workers_*_count` variables ask for.
+# This is useful for sizing resources that depend on the number of Synapse processes (e.g. the maximum number of Postgres connections).
+# Note: if `matrix_synapse_workers_enabled_list` is populated manually (instead of via the count variables), this count does not reflect it.
+matrix_synapse_workers_total_count: |
+  {{
+    (matrix_synapse_workers_room_workers_count | int)
+    + (matrix_synapse_workers_sync_workers_count | int)
+    + (matrix_synapse_workers_client_reader_workers_count | int)
+    + (matrix_synapse_workers_federation_reader_workers_count | int)
+    + (matrix_synapse_workers_generic_workers_count | int)
+    + (matrix_synapse_workers_pusher_workers_count | int)
+    + (matrix_synapse_workers_federation_sender_workers_count | int)
+    + (matrix_synapse_workers_media_repository_workers_count | int)
+    + (matrix_synapse_workers_appservice_workers_count | int)
+    + (matrix_synapse_workers_user_dir_workers_count | int)
+    + (matrix_synapse_workers_background_workers_count | int)
+    + (matrix_synapse_workers_stream_writers | length)
+  }}
+
 # Default list of workers to spawn.
 #
 # Unless you populate this manually, this list is dynamically generated
@@ -1329,6 +1359,9 @@ matrix_synapse_database_host: ''
 matrix_synapse_database_port: 5432
 matrix_synapse_database_cp_min: 5
 matrix_synapse_database_cp_max: 10
+matrix_synapse_database_keepalives_idle: null
+matrix_synapse_database_keepalives_interval: null
+matrix_synapse_database_keepalives_count: null
 matrix_synapse_database_user: "synapse"
 matrix_synapse_database_password: ""
 matrix_synapse_database_database: "synapse"
@@ -1405,16 +1438,7 @@ matrix_synapse_experimental_features_msc4108_enabled: false
 ################################################################################
 
 
-# Controls whether to enable the "room summary API" experimental feature.
-# See https://github.com/matrix-org/matrix-spec-proposals/pull/3266
-# Despite being experimental, this feature is mandatory for the next-generation Element X clients, which is why it is enabled by default:
-# https://github.com/element-hq/element-x-ios/issues/3713#issuecomment-2620958291
-# If you're worried about the privacy implications of this unauthenticated API, see:
-# https://github.com/deepbluev7/matrix-doc/blob/room-summaries/proposals/3266-room-summary.md#client-server-api
-# Set this to false if you still want to disable to API for some reason. Note that doing so breaks Element X compatibility though.
-matrix_synapse_experimental_features_msc3266_enabled: true
-
-# Controls whether to enable the "Delayed Events" experimental feature.
+# Controls whether to enable the "Delayed Events" feature (MSC4140).
 # Delayed events are required for proper call (Element Call) participation signalling.
 # If disabled it is very likely that you end up with stuck calls in Matrix rooms.
 #
@@ -1423,19 +1447,52 @@ matrix_synapse_experimental_features_msc3266_enabled: true
 # - `matrix_synapse_rc_delayed_event_mgmt`
 #
 # See https://github.com/matrix-org/matrix-spec-proposals/pull/4140
-matrix_synapse_experimental_features_msc4140_enabled: false
+matrix_synapse_delayed_events_enabled: false
 
 # Controls the maximum allowed duration by which sent events can be delayed, as per MSC4140.
+# Synapse enables delayed events based on this configuration setting being present.
 #
-# See `matrix_synapse_experimental_features_msc4140_enabled`.
+# This is only applied if `matrix_synapse_delayed_events_enabled` is set to `true`.
 matrix_synapse_max_event_delay_duration: 24h
 
 # Controls whether to enable the MSC4143 experimental feature (RTC transports).
 #
 # This is used by MatrixRTC clients to discover the unstable RTC transports API.
 #
+# This follows `matrix_synapse_matrix_rtc_transports`, because serving the RTC transports API without any transports configured
+# breaks MatrixRTC (Element Call) for clients which consult this API.
+# Such clients treat the API response as authoritative and do not fall back to the `org.matrix.msc4143.rtc_foci` property in the client well-known.
+#
 # See https://github.com/matrix-org/matrix-spec-proposals/pull/4143
-matrix_synapse_experimental_features_msc4143_enabled: false
+matrix_synapse_experimental_features_msc4143_enabled: "{{ matrix_synapse_matrix_rtc_transports | length > 0 }}"
+
+# Controls the `matrix_rtc.transports` setting - the list of MatrixRTC transports advertised via the RTC transports API (MSC4143).
+#
+# The API serving this list is only enabled when `matrix_synapse_experimental_features_msc4143_enabled` is set to `true`.
+# Otherwise, this setting is parsed by Synapse, but remains unused.
+matrix_synapse_matrix_rtc_transports: "{{ matrix_synapse_matrix_rtc_transports_default + matrix_synapse_matrix_rtc_transports_auto + matrix_synapse_matrix_rtc_transports_custom }}"
+
+# Holds the default MatrixRTC transports list, driven by `matrix_synapse_matrix_rtc_transports_livekit_url`.
+matrix_synapse_matrix_rtc_transports_default: |-
+  {{
+    (
+      [{'type': 'livekit', 'livekit_service_url': matrix_synapse_matrix_rtc_transports_livekit_url}] if matrix_synapse_matrix_rtc_transports_livekit_url != '' else []
+    )
+  }}
+
+# Holds MatrixRTC transports entries that a playbook may inject automatically, based on the state of other services.
+#
+# This variable is not meant to be redefined by users.
+# To inject your own entries, use `matrix_synapse_matrix_rtc_transports_custom`.
+matrix_synapse_matrix_rtc_transports_auto: []
+
+# Holds additional MatrixRTC transports entries that you may wish to inject.
+matrix_synapse_matrix_rtc_transports_custom: []
+
+# Controls the MatrixRTC LiveKit URL auto-added to `matrix_synapse_matrix_rtc_transports`.
+#
+# This is set automatically if you are using the playbook's MatrixRTC stack.
+matrix_synapse_matrix_rtc_transports_livekit_url: ''
 
 # Controls whether to enable the MSC4222 experimental feature (adding `state_after` to sync v2).
 #
@@ -1461,6 +1518,46 @@ matrix_synapse_experimental_features_msc4306_enabled: false
 #
 # See https://github.com/matrix-org/matrix-spec-proposals/pull/4354
 matrix_synapse_experimental_features_msc4354_enabled: false
+
+# Holds the final `experimental_features` configuration for the Synapse homeserver.
+#
+# This is constructed from various other variables and is not meant to be redefined directly.
+# To influence it, use the various `matrix_synapse_experimental_features_msc*_enabled` variables or add your own configuration to `matrix_synapse_experimental_features_custom`.
+matrix_synapse_experimental_features: "{{ matrix_synapse_experimental_features_default | combine(matrix_synapse_experimental_features_auto, recursive=True) | combine(matrix_synapse_experimental_features_custom, recursive=True) }}"
+
+# Holds the default `experimental_features` configuration, driven by the various `matrix_synapse_experimental_features_msc*_enabled` variables.
+#
+# Flags are only included when enabled, because Synapse changes flag defaults (or removes flags) across versions and we don't wish to interfere.
+# The end result is always a mapping (potentially an empty one), never `null`, because Synapse (v1.157.0+) does not tolerate `experimental_features` being `null`.
+matrix_synapse_experimental_features_default: |
+  {{
+    {
+      'msc2409_to_device_messages_enabled': matrix_synapse_experimental_features_msc2409_to_device_messages_enabled | bool,
+      'msc3202_transaction_extensions': matrix_synapse_experimental_features_msc3202_transaction_extensions_enabled | bool,
+      'msc4108_enabled': matrix_synapse_experimental_features_msc4108_enabled | bool,
+      'msc4143_enabled': matrix_synapse_experimental_features_msc4143_enabled | bool,
+      'msc4222_enabled': matrix_synapse_experimental_features_msc4222_enabled | bool,
+      'msc4306_enabled': matrix_synapse_experimental_features_msc4306_enabled | bool,
+      'msc4354_enabled': matrix_synapse_experimental_features_msc4354_enabled | bool,
+    }
+    | dict2items
+    | selectattr('value')
+    | list
+    | items2dict
+  }}
+
+# Holds `experimental_features` configuration that this playbook enables automatically, based on the state of other services.
+#
+# This variable is meant to be used by the playbook (see `group_vars/matrix_servers`) and is not meant to be redefined by users.
+# To inject your own configuration, use `matrix_synapse_experimental_features_custom`.
+matrix_synapse_experimental_features_auto: {}
+
+# Holds additional `experimental_features` configuration that you may wish to inject.
+#
+# Example:
+# matrix_synapse_experimental_features_custom:
+#   msc9999_enabled: true
+matrix_synapse_experimental_features_custom: {}
 
 # Enable this to activate the REST auth password provider module.
 # See: https://github.com/ma1uta/matrix-synapse-rest-password-provider
@@ -1544,7 +1641,7 @@ matrix_synapse_ext_spam_checker_mjolnir_antispam_config:
 matrix_synapse_ext_synapse_http_antispam_enabled: false
 matrix_synapse_ext_synapse_http_antispam_git_repository_url: "https://github.com/maunium/synapse-http-antispam"
 # renovate: datasource=github-releases depName=maunium/synapse-http-antispam
-matrix_synapse_ext_synapse_http_antispam_git_version: "v0.5.0"
+matrix_synapse_ext_synapse_http_antispam_git_version: "v0.5.1"
 # Where Synapse can locate the consumer of the antispam API. Currently
 # Draupnir is the only consumer of this API that is playbook supported.
 # But https://github.com/maunium/meowlnir also supports the API.
@@ -1605,7 +1702,7 @@ matrix_synapse_ext_encryption_config_yaml: |
 # Enabling this will enable customizations and inject the appropriate Dockerfile clauses for installing synapse-s3-storage-provider.
 matrix_synapse_ext_synapse_s3_storage_provider_enabled: false
 # renovate: datasource=github-releases depName=matrix-org/synapse-s3-storage-provider
-matrix_synapse_ext_synapse_s3_storage_provider_version: 1.6.0
+matrix_synapse_ext_synapse_s3_storage_provider_version: 1.7.0
 # Controls whether media from this (local) server is stored in s3-storage-provider
 matrix_synapse_ext_synapse_s3_storage_provider_store_local: true
 # Controls whether media from remote servers is stored in s3-storage-provider
@@ -1658,7 +1755,6 @@ matrix_s3_goofys_container_image: "{{ matrix_s3_goofys_container_image_registry_
 matrix_s3_goofys_container_image_registry_prefix: "{{ matrix_s3_goofys_container_image_registry_prefix_upstream }}"
 matrix_s3_goofys_container_image_registry_prefix_upstream: "{{ matrix_s3_goofys_container_image_registry_prefix_upstream_default }}"
 matrix_s3_goofys_container_image_registry_prefix_upstream_default: "docker.io/"
-matrix_s3_goofys_container_image_force_pull: "{{ matrix_s3_goofys_container_image.endswith(':latest') }}"
 matrix_s3_media_store_custom_endpoint: "your-custom-endpoint"
 matrix_s3_media_store_bucket_name: "your-bucket-name"
 matrix_s3_media_store_aws_access_key: "your-aws-access-key"
@@ -1776,7 +1872,6 @@ matrix_synapse_rust_synapse_compress_state_container_image_version: v0.0.3
 matrix_synapse_rust_synapse_compress_state_container_image_registry_prefix: "{{ matrix_synapse_rust_synapse_compress_state_container_image_registry_prefix_upstream }}"
 matrix_synapse_rust_synapse_compress_state_container_image_registry_prefix_upstream: "{{ matrix_synapse_rust_synapse_compress_state_container_image_registry_prefix_upstream_default }}"
 matrix_synapse_rust_synapse_compress_state_container_image_registry_prefix_upstream_default: "registry.gitlab.com/"
-matrix_synapse_rust_synapse_compress_state_container_image_force_pull: "{{ matrix_synapse_rust_synapse_compress_state_container_image.endswith(':stable') or matrix_synapse_rust_synapse_compress_state_container_image.endswith(':latest') }}"
 
 matrix_synapse_rust_synapse_compress_state_base_path: "{{ matrix_base_data_path }}/rust-synapse-compress-state"
 matrix_synapse_rust_synapse_compress_state_synapse_compress_state_in_container_path: "/usr/local/bin/synapse_compress_state"
@@ -1835,7 +1930,7 @@ matrix_synapse_register_user_script_matrix_authentication_service_path: ""
 matrix_synapse_reverse_proxy_companion_enabled: "{{ matrix_synapse_enabled and matrix_synapse_workers_enabled }}"
 
 # renovate: datasource=docker depName=nginx
-matrix_synapse_reverse_proxy_companion_version: 1.29.7-alpine
+matrix_synapse_reverse_proxy_companion_version: 1.31.5-alpine
 
 matrix_synapse_reverse_proxy_companion_base_path: "{{ matrix_synapse_base_path }}/reverse-proxy-companion"
 matrix_synapse_reverse_proxy_companion_confd_path: "{{ matrix_synapse_reverse_proxy_companion_base_path }}/conf.d"
@@ -1858,7 +1953,6 @@ matrix_synapse_reverse_proxy_companion_container_image_registry_prefix: "{{ matr
 matrix_synapse_reverse_proxy_companion_container_image_registry_prefix_upstream: "{{ matrix_synapse_reverse_proxy_companion_container_image_registry_prefix_upstream_default }}"
 matrix_synapse_reverse_proxy_companion_container_image_registry_prefix_upstream_default: "docker.io/"
 matrix_synapse_reverse_proxy_companion_container_image_tag: "{{ matrix_synapse_reverse_proxy_companion_version }}"
-matrix_synapse_reverse_proxy_companion_container_image_force_pull: "{{ matrix_synapse_reverse_proxy_companion_container_image.endswith(':latest') }}"
 
 matrix_synapse_reverse_proxy_companion_container_network: "{{ matrix_synapse_container_network }}"
 
@@ -2102,6 +2196,7 @@ matrix_synapse_reverse_proxy_companion_synapse_stream_writer_presence_stream_wor
 matrix_synapse_reverse_proxy_companion_synapse_stream_writer_push_rules_stream_worker_client_server_locations: "{{ matrix_synapse_workers_stream_writer_push_rules_stream_worker_client_server_endpoints }}"
 matrix_synapse_reverse_proxy_companion_synapse_stream_writer_device_lists_stream_worker_client_server_locations: "{{ matrix_synapse_workers_stream_writer_device_lists_stream_worker_client_server_endpoints }}"
 matrix_synapse_reverse_proxy_companion_synapse_stream_writer_thread_subscriptions_stream_worker_client_server_locations: "{{ matrix_synapse_workers_stream_writer_thread_subscriptions_stream_worker_client_server_endpoints }}"
+matrix_synapse_reverse_proxy_companion_synapse_stream_writer_quarantined_media_changes_stream_worker_client_server_locations: "{{ matrix_synapse_workers_stream_writer_quarantined_media_changes_stream_worker_client_server_endpoints }}"
 matrix_synapse_reverse_proxy_companion_synapse_media_repository_locations: "{{ matrix_synapse_workers_media_repository_endpoints | default([]) }}"
 matrix_synapse_reverse_proxy_companion_synapse_user_dir_locations: "{{ matrix_synapse_workers_user_dir_worker_client_server_endpoints | default([]) }}"
 matrix_synapse_reverse_proxy_companion_client_server_main_override_locations_regex: ^/_matrix/client/(api/v1|r0|v3|unstable)/(account/3pid/|directory/list/room/|rooms/[^/]+/(forget|upgrade|report)|register)

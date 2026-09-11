@@ -14,7 +14,7 @@ The playbook can install and configure the [mautrix-meta](https://github.com/mau
 
 See the project's [documentation](https://docs.mau.fi/bridges/go/meta/index.html) to learn what it does and why it might be useful to you.
 
-Since this bridge component can bridge to both [Messenger](https://messenger.com/) and [Instagram](https://instagram.com/) and you may wish to do both at the same time, the playbook makes it available via 2 different Ansible roles (`matrix-bridge-mautrix-meta-messenger` and `matrix-bridge-mautrix-meta-instagram`). The latter is a reconfigured copy of the first one (created by `just rebuild-mautrix-meta-instagram` and `bin/rebuild-mautrix-meta-instagram.sh`).
+The mautrix-meta project provides bridging to both [Messenger](https://messenger.com/) and [Instagram](https://instagram.com/), each via a separate bridge (its own binary and container image) since mautrix-meta v26.07. The playbook makes them available via 2 different Ansible roles (`matrix-bridge-mautrix-meta-messenger` and `matrix-bridge-mautrix-meta-instagram`), which can both be enabled at the same time.
 
 This documentation page only deals with the bridge's ability to bridge to Facebook Messenger. For bridging to Instagram, see [Setting up Instagram bridging via Mautrix Meta](configuring-playbook-bridge-mautrix-meta-instagram.md).
 
@@ -41,7 +41,7 @@ See [this section](configuring-playbook-bridge-mautrix-bridges.md#set-up-double-
 To enable the bridge, add the following configuration to your `inventory/host_vars/matrix.example.com/vars.yml` file:
 
 ```yaml
-matrix_mautrix_meta_messenger_enabled: true
+matrix_bridge_mautrix_meta_messenger_enabled: true
 ```
 
 Before proceeding to [re-running the playbook](./installing.md), you may wish to adjust the configuration further. See below.
@@ -56,7 +56,7 @@ The bridge can pull your Messenger messages via 3 different methods:
 - (`facebook-tor`) Facebook via `facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion` ([Tor](https://www.torproject.org/)) — does not currently proxy media downloads
 - (default) (`messenger`) Messenger via `messenger.com` — usable even without a Facebook account
 
-You may switch the mode via the `matrix_mautrix_meta_messenger_meta_mode` variable. The playbook defaults to the `messenger` mode, because it's most universal (every Facebook user has a Messenger account, but the opposite is not true).
+You may switch the mode via the `matrix_bridge_mautrix_meta_messenger_meta_mode` variable. The playbook defaults to the `messenger` mode, because it's most universal (every Facebook user has a Messenger account, but the opposite is not true).
 
 Note that switching the mode (especially between `facebook*` and `messenger`) will intentionally make the bridge use another database (`matrix_mautrix_meta_facebook` or `matrix_mautrix_meta_messenger`) to isolate the 2 instances. Switching between Tor and non-Tor may be possible without dataloss, but your mileage may vary. Before switching to a new mode, you may wish to de-configure the old one (send `help` to the bridge bot and unbridge your portals, etc.).
 
@@ -99,5 +99,5 @@ The default logging level for this component is `warn`. If you want to increase 
 
 ```yaml
 # This bridge uses zerolog, so valid levels are: panic, fatal, error, warn, info, debug, trace
-matrix_mautrix_meta_messenger_logging_min_level: debug
+matrix_bridge_mautrix_meta_messenger_logging_min_level: debug
 ```

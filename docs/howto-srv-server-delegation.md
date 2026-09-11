@@ -26,7 +26,7 @@ The up-to-date list can be accessed on [traefik's documentation](https://doc.tra
 
 **Note**: the changes below instruct you how to do this for a basic Synapse installation. You will need to adapt the variable name and the content of the labels:
 
-- if you're using another homeserver implementation (e.g. [Conduit](./configuring-playbook-conduit.md), [continuwuity](./configuring-playbook-continuwuity.md) or [Dendrite](./configuring-playbook-dendrite.md))
+- if you're using another homeserver implementation (e.g. [Conduit](./configuring-playbook-conduit.md), [continuwuity](./configuring-playbook-continuwuity.md), [Tuwunel](./configuring-playbook-tuwunel.md) or [Dendrite](./configuring-playbook-dendrite.md))
 - if you're using [Synapse with workers enabled](./configuring-playbook-synapse.md#load-balancing-with-workers) (`matrix_synapse_workers_enabled: true`). In that case, it's actually the `matrix-synapse-reverse-proxy-companion` service which has Traefik labels attached
 
 Also, all instructions below are from an older version of the playbook and may not work anymore.
@@ -49,8 +49,8 @@ This is because the Matrix specification expects the federation endpoint to be s
 ```yaml
 # To let Traefik know which domains' certificates to serve
 matrix_synapse_container_labels_additional_labels: |
-  traefik.http.routers.matrix-synapse-federation-api.tls.domains.main="example.com"
-  traefik.http.routers.matrix-synapse-federation-api.tls.domains.sans="*.example.com"
+  traefik.http.routers.matrix-synapse-public-federation-api.tls.domains.main="example.com"
+  traefik.http.routers.matrix-synapse-public-federation-api.tls.domains.sans="*.example.com"
 ```
 
 ### Configure the DNS-01 challenge for let's encrypt
@@ -137,8 +137,8 @@ matrix_synapse_container_labels_public_federation_api_traefik_rule: PathPrefix(`
 
 # To let Traefik know which domains' certificates to serve
 matrix_synapse_container_labels_additional_labels: |
-  traefik.http.routers.matrix-synapse-federation-api.tls.domains.main="example.com"
-  traefik.http.routers.matrix-synapse-federation-api.tls.domains.sans="*.example.com"
+  traefik.http.routers.matrix-synapse-public-federation-api.tls.domains.main="example.com"
+  traefik.http.routers.matrix-synapse-public-federation-api.tls.domains.sans="*.example.com"
 
 # Add a new ACME configuration without having to disable the default one, since it would have a wide range of side effects
 traefik_configuration_extension_yaml: |

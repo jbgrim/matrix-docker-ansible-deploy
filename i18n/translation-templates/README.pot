@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: matrix-docker-ansible-deploy \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-13 10:32+0000\n"
+"POT-Creation-Date: 2026-08-13 05:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,7 @@ msgid "🎯 Purpose"
 msgstr ""
 
 #: ../../../README.md:7
-msgid "This [Ansible](https://www.ansible.com/) playbook is meant to help you run your own [Matrix](http://matrix.org/) homeserver, along with the [various services](#supported-services) related to that."
+msgid "This [Ansible](https://www.ansible.com/) playbook is meant to help you run your own [Matrix](http://matrix.org/) homeserver, along with the [various services](#-supported-services) related to that."
 msgstr ""
 
 #: ../../../README.md:9
@@ -189,6 +189,18 @@ msgid "[Link](docs/configuring-playbook-continuwuity.md)"
 msgstr ""
 
 #: ../../../README.md:0
+msgid "[Tuwunel](https://matrix-construct.github.io/tuwunel/)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Storing your data and managing your presence in the [Matrix](http://matrix.org/) network. Tuwunel is the official successor to conduwuit."
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-tuwunel.md)"
+msgstr ""
+
+#: ../../../README.md:0
 msgid "[Dendrite](https://github.com/element-hq/dendrite)"
 msgstr ""
 
@@ -200,11 +212,11 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-dendrite.md)"
 msgstr ""
 
-#: ../../../README.md:58
+#: ../../../README.md:59
 msgid "Clients"
 msgstr ""
 
-#: ../../../README.md:60
+#: ../../../README.md:61
 msgid "Web clients for Matrix that you can host on your own domains."
 msgstr ""
 
@@ -245,6 +257,14 @@ msgid "[Link](docs/configuring-playbook-client-cinny.md)"
 msgstr ""
 
 #: ../../../README.md:0
+msgid "[Sable](https://github.com/SableClient/Sable)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-client-sable.md)"
+msgstr ""
+
+#: ../../../README.md:0
 msgid "[SchildiChat Web](https://schildi.chat/)"
 msgstr ""
 
@@ -268,11 +288,23 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-client-fluffychat-web.md)"
 msgstr ""
 
-#: ../../../README.md:70
+#: ../../../README.md:0
+msgid "[Commet](https://github.com/commetchat/commet)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Matrix web client"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-client-commet.md)"
+msgstr ""
+
+#: ../../../README.md:73
 msgid "Server Components"
 msgstr ""
 
-#: ../../../README.md:72
+#: ../../../README.md:75
 msgid "Services that run on the server to make the various parts of your installation work."
 msgstr ""
 
@@ -286,18 +318,6 @@ msgstr ""
 
 #: ../../../README.md:0
 msgid "[Link](docs/configuring-playbook-external-postgres.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[coturn](https://github.com/coturn/coturn)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "STUN/TURN server for WebRTC audio/video calls"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-turn.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -337,6 +357,18 @@ msgid "[Link](docs/configuring-playbook-email.md)"
 msgstr ""
 
 #: ../../../README.md:0
+msgid "[coturn](https://github.com/coturn/coturn)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "STUN/TURN server for WebRTC audio/video calls"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-turn.md)"
+msgstr ""
+
+#: ../../../README.md:0
 msgid "[ddclient](https://github.com/linuxserver/docker-ddclient)"
 msgstr ""
 
@@ -349,34 +381,22 @@ msgid "[Link](docs/configuring-playbook-dynamic-dns.md)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[LiveKit Server](https://github.com/livekit/livekit)"
+msgid "Matrix RTC stack"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "WebRTC server for audio/video calls"
+msgid "Supporting components ([LiveKit Server](docs/configuring-playbook-livekit-server.md) and [LiveKit JWT Service](docs/configuring-playbook-livekit-jwt-service.md)) for in-app audio/video calls for Matrix clients"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-livekit-server.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Livekit JWT Service](https://github.com/livekit/livekit-jwt-service)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "JWT service for integrating [Element Call](./configuring-playbook-element-call.md) with [LiveKit Server](./configuring-playbook-livekit-server.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-livekit-jwt-service.md)"
-msgstr ""
-
-#: ../../../README.md:85
-msgid "Authentication"
+msgid "[Link](docs/configuring-playbook-matrix-rtc.md)"
 msgstr ""
 
 #: ../../../README.md:87
+msgid "Authentication"
+msgstr ""
+
+#: ../../../README.md:89
 msgid "Extend and modify how users are authenticated on your homeserver."
 msgstr ""
 
@@ -414,30 +434,6 @@ msgstr ""
 
 #: ../../../README.md:0
 msgid "[Link](docs/configuring-playbook-ldap-auth.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[matrix-ldap-registration-proxy](https://gitlab.com/activism.international/matrix_ldap_registration_proxy) (advanced)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "Proxy that handles Matrix registration requests and forwards them to LDAP"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-matrix-ldap-registration-proxy.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[matrix-registration](https://github.com/ZerataX/matrix-registration)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "Simple python application to have a token based Matrix registration"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-matrix-registration.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -561,6 +557,30 @@ msgid "[Link](docs/configuring-playbook-bridge-mautrix-gmessages.md)"
 msgstr ""
 
 #: ../../../README.md:0
+msgid "[mautrix-gvoice](https://github.com/mautrix/gvoice)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Bridge to [Google Voice](https://voice.google.com/)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-bridge-mautrix-gvoice.md)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[mautrix-linkedin](https://github.com/mautrix/linkedin)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Bridge to [LinkedIn](https://www.linkedin.com/)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-bridge-mautrix-linkedin.md)"
+msgstr ""
+
+#: ../../../README.md:0
 msgid "[mautrix-whatsapp](https://github.com/mautrix/whatsapp)"
 msgstr ""
 
@@ -582,6 +602,18 @@ msgstr ""
 
 #: ../../../README.md:0
 msgid "[Link](docs/configuring-playbook-bridge-mautrix-wsproxy.md)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[matrix-rustpush-bridge](https://github.com/jasonlaguidice/imessage)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Bridge to [iMessage](https://support.apple.com/messages) via Apple Push Notification service"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-bridge-rustpush.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -621,7 +653,7 @@ msgid "[Link](docs/configuring-playbook-bridge-mautrix-googlechat.md)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[mautrix-meta](https://github.com/mautrix/instagram)"
+msgid "[mautrix-meta](https://github.com/mautrix/meta)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -645,15 +677,15 @@ msgid "[Link](docs/configuring-playbook-bridge-mautrix-signal.md)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[beeper-linkedin](https://github.com/beeper/linkedin)"
+msgid "[beeper-line](https://github.com/beeper/line)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "Bridge to [LinkedIn](https://www.linkedin.com/)"
+msgid "Bridge to [LINE](https://line.me/)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-bridge-beeper-linkedin.md)"
+msgid "[Link](docs/configuring-playbook-bridge-beeper-line.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -669,18 +701,6 @@ msgid "[Link](docs/configuring-playbook-bridge-appservice-irc.md)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[matrix-appservice-kakaotalk](https://src.miscworks.net/fair/matrix-appservice-kakaotalk)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "Bridge to [Kakaotalk](https://www.kakaocorp.com/page/service/service/KakaoTalk?lang=ENG)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-bridge-appservice-kakaotalk.md)"
-msgstr ""
-
-#: ../../../README.md:0
 msgid "[matrix-appservice-discord](https://github.com/matrix-org/matrix-appservice-discord)"
 msgstr ""
 
@@ -690,14 +710,6 @@ msgstr ""
 
 #: ../../../README.md:0
 msgid "[Link](docs/configuring-playbook-bridge-appservice-discord.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[matrix-appservice-slack](https://github.com/matrix-org/matrix-appservice-slack)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-bridge-appservice-slack.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -761,6 +773,18 @@ msgid "[Link](docs/configuring-playbook-bridge-heisenbridge.md)"
 msgstr ""
 
 #: ../../../README.md:0
+msgid "[meshtastic-matrix-relay](https://github.com/jeremiah-k/meshtastic-matrix-relay)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Bridge to [Meshtastic](https://meshtastic.org/) mesh networks"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-bridge-meshtastic-relay.md)"
+msgstr ""
+
+#: ../../../README.md:0
 msgid "[mx-puppet-groupme](https://gitlab.com/xangelix-pub/matrix/mx-puppet-groupme)"
 msgstr ""
 
@@ -796,11 +820,11 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-bridge-postmoogle.md)"
 msgstr ""
 
-#: ../../../README.md:140
+#: ../../../README.md:142
 msgid "Bots"
 msgstr ""
 
-#: ../../../README.md:142
+#: ../../../README.md:144
 msgid "Bots provide various additional functionality to your installation."
 msgstr ""
 
@@ -826,18 +850,6 @@ msgstr ""
 
 #: ../../../README.md:0
 msgid "[Link](docs/configuring-playbook-bot-matrix-reminder-bot.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[matrix-registration-bot](https://github.com/moan0s/matrix-registration-bot)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "Bot for invitations by creating and managing registration tokens"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-bot-matrix-registration-bot.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -889,6 +901,18 @@ msgid "[Link](docs/configuring-playbook-bot-draupnir.md) (for [appservice mode](
 msgstr ""
 
 #: ../../../README.md:0
+msgid "[Meowlnir](https://github.com/maunium/meowlnir)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Moderation tool for Matrix, running in appservice mode"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-bot-meowlnir.md)"
+msgstr ""
+
+#: ../../../README.md:0
 msgid "[Buscarron](https://github.com/etkecc/buscarron)"
 msgstr ""
 
@@ -900,11 +924,11 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-bot-buscarron.md)"
 msgstr ""
 
-#: ../../../README.md:155
+#: ../../../README.md:157
 msgid "Administration"
 msgstr ""
 
-#: ../../../README.md:157
+#: ../../../README.md:159
 msgid "Services that help you in administrating and monitoring your Matrix installation."
 msgstr ""
 
@@ -933,15 +957,15 @@ msgid "[Link](docs/configuring-playbook-matrix-authentication-service.md)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[synapse-admin](https://github.com/etkecc/synapse-admin)"
+msgid "[Ketesa](https://github.com/etkecc/ketesa)"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "Web UI tool for administrating users and rooms on your Matrix server"
+msgid "Fully-featured web UI for administrating your Matrix homeserver — users, rooms, media, sessions, and more"
 msgstr ""
 
 #: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-synapse-admin.md)"
+msgid "[Link](docs/configuring-playbook-ketesa.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -992,24 +1016,12 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-synapse-usage-exporter.md)"
 msgstr ""
 
-#: ../../../README.md:169
+#: ../../../README.md:171
 msgid "Misc"
 msgstr ""
 
-#: ../../../README.md:171
+#: ../../../README.md:173
 msgid "Various services that don't fit any other categories."
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[synapse_auto_accept_invite](https://github.com/matrix-org/synapse-auto-accept-invite)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "Synapse module to automatically accept invites"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-synapse-auto-accept-invite.md)"
 msgstr ""
 
 #: ../../../README.md:0
@@ -1132,54 +1144,54 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-element-call.md)"
 msgstr ""
 
-#: ../../../README.md:187
+#: ../../../README.md:188
 msgid "🆕 Changes"
 msgstr ""
 
-#: ../../../README.md:189
+#: ../../../README.md:190
 msgid "This playbook evolves over time, sometimes with backward-incompatible changes."
 msgstr ""
 
-#: ../../../README.md:191
+#: ../../../README.md:192
 msgid "When updating the playbook, refer to [the changelog](CHANGELOG.md) to catch up with what's new."
 msgstr ""
 
-#: ../../../README.md:193
+#: ../../../README.md:194
 msgid "🆘 Support"
 msgstr ""
 
-#: ../../../README.md:195
+#: ../../../README.md:196
 msgid "Matrix room: [#matrix-docker-ansible-deploy:devture.com](https://matrix.to/#/#matrix-docker-ansible-deploy:devture.com)"
 msgstr ""
 
-#: ../../../README.md:197
+#: ../../../README.md:198
 msgid "IRC channel: `#matrix-docker-ansible-deploy` on the [Libera Chat](https://libera.chat/) IRC network (irc.libera.chat:6697)"
 msgstr ""
 
-#: ../../../README.md:199
+#: ../../../README.md:200
 msgid "GitHub issues: [spantaleev/matrix-docker-ansible-deploy/issues](https://github.com/spantaleev/matrix-docker-ansible-deploy/issues)"
 msgstr ""
 
-#: ../../../README.md:201
+#: ../../../README.md:202
 msgid "🌐 Translation"
 msgstr ""
 
-#: ../../../README.md:203
+#: ../../../README.md:204
 msgid "See the [i18n/README.md](i18n/README.md) file for more information about translation."
 msgstr ""
 
-#: ../../../README.md:205
+#: ../../../README.md:206
 msgid "Translations are still work in progress."
 msgstr ""
 
-#: ../../../README.md:207
+#: ../../../README.md:208
 msgid "🤝 Related"
 msgstr ""
 
-#: ../../../README.md:209
+#: ../../../README.md:210
 msgid "You may also be interested in [mash-playbook](https://github.com/mother-of-all-self-hosting/mash-playbook) - another Ansible playbook for self-hosting non-Matrix services (see its [List of supported services](https://github.com/mother-of-all-self-hosting/mash-playbook/blob/main/docs/supported-services.md))."
 msgstr ""
 
-#: ../../../README.md:211
+#: ../../../README.md:212
 msgid "mash-playbook also makes use of [Traefik](./docs/configuring-playbook-traefik.md) as its reverse-proxy, so with minor [interoperability adjustments](https://github.com/mother-of-all-self-hosting/mash-playbook/blob/main/docs/interoperability.md), you can make matrix-docker-ansible-deploy and mash-playbook co-exist and host Matrix and non-Matrix services on the same server."
 msgstr ""

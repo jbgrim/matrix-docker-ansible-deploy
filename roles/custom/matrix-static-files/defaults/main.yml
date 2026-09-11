@@ -13,7 +13,7 @@ matrix_static_files_enabled: true
 matrix_static_files_identifier: matrix-static-files
 
 # renovate: datasource=docker depName=joseluisq/static-web-server
-matrix_static_files_version: 2.42.0
+matrix_static_files_version: 2.44.0
 
 matrix_static_files_base_path: "{{ matrix_base_data_path }}/{{ 'static-files' if matrix_static_files_identifier == 'matrix-static-files' else matrix_static_files_identifier }}"
 matrix_static_files_config_path: "{{ matrix_static_files_base_path }}/config"
@@ -35,7 +35,6 @@ matrix_static_files_container_image_registry_prefix: "{{ matrix_static_files_con
 matrix_static_files_container_image_registry_prefix_upstream: "{{ matrix_static_files_container_image_registry_prefix_upstream_default }}"
 matrix_static_files_container_image_registry_prefix_upstream_default: "docker.io/"
 matrix_static_files_container_image_tag: "{{ 'latest' if matrix_static_files_version == 'latest' else (matrix_static_files_version + '-alpine') }}"
-matrix_static_files_container_image_force_pull: "{{ matrix_static_files_container_image.endswith(':latest') }}"
 
 matrix_static_files_container_network: "{{ matrix_static_files_identifier }}"
 
@@ -85,7 +84,7 @@ matrix_static_files_container_labels_well_known_matrix_endpoint_middleware_compr
 matrix_static_files_container_labels_base_domain_enabled: false
 matrix_static_files_container_labels_base_domain_traefik_hostname: ''
 matrix_static_files_container_labels_base_domain_traefik_path_prefix: /
-matrix_static_files_container_labels_base_domain_traefik_rule: "Host(`{{ matrix_static_files_container_labels_base_domain_traefik_hostname }}`){% if matrix_static_files_container_labels_base_domain_traefik_path_prefix != '/' %} && PathPrefix(`{{ matrix_static_files_container_labels_well_known_matrix_endpoint_traefik_path_prefix }}`){% endif %}"
+matrix_static_files_container_labels_base_domain_traefik_rule: "Host(`{{ matrix_static_files_container_labels_base_domain_traefik_hostname }}`){% if matrix_static_files_container_labels_base_domain_traefik_path_prefix != '/' %} && PathPrefix(`{{ matrix_static_files_container_labels_base_domain_traefik_path_prefix }}`){% endif %}"
 matrix_static_files_container_labels_base_domain_traefik_priority: 0
 matrix_static_files_container_labels_base_domain_traefik_entrypoints: "{{ matrix_static_files_container_labels_traefik_entrypoints }}"
 matrix_static_files_container_labels_base_domain_traefik_tls: "{{ matrix_static_files_container_labels_base_domain_traefik_entrypoints != 'web' }}"
@@ -192,23 +191,30 @@ matrix_static_files_file_matrix_client_property_io_element_e2ee_default: true
 # See: https://github.com/element-hq/element-web/blob/develop/docs/e2ee.md
 matrix_static_files_file_matrix_client_property_io_element_e2ee_force_disable: false
 
-# Controls whether `cc.etke.synapse-admin`-related entries should be added to the client well-known.
-# By default, if there are entries in `matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin`, we show them (by enabling this).
-matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin_enabled: "{{ matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin | default({}) | dict2items | length > 0 }}"
+# Controls whether `cc.etke.ketesa`-related entries should be added to the client well-known.
+# By default, if there are entries in `matrix_static_files_file_matrix_client_property_cc_etke_ketesa`, we show them (by enabling this).
+matrix_static_files_file_matrix_client_property_cc_etke_ketesa_enabled: "{{ matrix_static_files_file_matrix_client_property_cc_etke_ketesa | default({}) | dict2items | length > 0 }}"
 
-# Controls the cc.etke.synapse-admin property in the /.well-known/matrix/client file.
-# See `matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin_entries_enabled`
-matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin: "{{ matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin_auto | combine(matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin_custom, recursive=True) }}"
-matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin_auto: {}
-matrix_static_files_file_matrix_client_property_cc_etke_synapse_admin_custom: {}
+# Controls the cc.etke.ketesa property in the /.well-known/matrix/client file.
+matrix_static_files_file_matrix_client_property_cc_etke_ketesa: "{{ matrix_static_files_file_matrix_client_property_cc_etke_ketesa_auto | combine(matrix_static_files_file_matrix_client_property_cc_etke_ketesa_custom, recursive=True) }}"
+matrix_static_files_file_matrix_client_property_cc_etke_ketesa_auto: {}
+matrix_static_files_file_matrix_client_property_cc_etke_ketesa_custom: {}
 
+
+# The `org.matrix.msc4143.rtc_foci` property has been dropped from MSC4143 in favor of the homeserver's own RTC transports API,
+# but remains the only way to reach clients which cannot consult that API.
+# Element Call running as a widget (which is how Element Web and Element Desktop invoke it) is one such client,
+# because a widget holds no access token of its own and the API requires authentication.
+# Newer Element Call versions ask their host client for the transports over the widget API (MSC4515) instead,
+# so this property can go away once such versions are widely deployed.
+#
 # Controls whether `org.matrix.msc4143.rtc_foci`-related entries should be added to the client well-known.
 # By default, if there are entries in `matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci`, we show them (by enabling this).
-matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_enabled: "{{ matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci | default({}) | dict2items | length > 0 }}"
+matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_enabled: "{{ matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci | default([]) | length > 0 }}"
 
 # Controls the org.matrix.msc4143.rtc_foci property in the /.well-known/matrix/client file.
 # See `matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_enabled`
-matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci: "{{ matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_auto+ matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_custom }}"
+matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci: "{{ matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_auto + matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_custom }}"
 matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_auto: []
 matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_custom: []
 
@@ -355,6 +361,59 @@ matrix_static_files_file_matrix_support_configuration: "{{ matrix_static_files_f
 ########################################################################
 #                                                                      #
 # /Related to /.well-known/matrix/support                              #
+#                                                                      #
+########################################################################
+
+
+########################################################################
+#                                                                      #
+# Related to /.well-known/matrix/mautrix                               #
+#                                                                      #
+########################################################################
+
+# Controls whether a `/.well-known/matrix/mautrix` file is generated and used at all.
+# This file allows tools like Mautrix Manager (https://github.com/mautrix/manager) to auto-discover the bridges hosted on this server.
+# By default, it's enabled only when there's something to advertise (see `matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges`).
+matrix_static_files_file_matrix_mautrix_enabled: "{{ matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges | length > 0 }}"
+
+# Controls the fi.mau.bridges property in the /.well-known/matrix/mautrix file.
+# This is a list of base URLs for bridges hosted on (and connected to) this server.
+matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges: "{{ matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges_auto + matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges_custom }}"
+matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges_auto: []
+matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges_custom: []
+
+# Default /.well-known/matrix/mautrix configuration template which covers the generic use case.
+# You can customize it by controlling the various variables inside it.
+#
+# For a more advanced customization, you can extend the default (see `matrix_static_files_file_matrix_mautrix_configuration_extension_json`)
+# or completely replace this variable with your own template.
+matrix_static_files_file_matrix_mautrix_configuration_json: "{{ lookup('template', 'templates/public/.well-known/matrix/mautrix.j2', convert_data=False) | from_json }}"
+
+# Your custom JSON configuration for /.well-known/matrix/mautrix should go to `matrix_static_files_file_matrix_mautrix_configuration_extension_json`.
+# This configuration extends the default starting configuration (`matrix_static_files_file_matrix_mautrix_configuration_extension_json`).
+#
+# You can override individual variables from the default configuration, or introduce new ones.
+#
+# If you need something more special, you can take full control by
+# completely redefining `matrix_static_files_file_matrix_mautrix_configuration_json`.
+#
+# Example configuration extension follows:
+#
+# matrix_static_files_file_matrix_mautrix_configuration_extension_json: |
+#   {
+#     "fi.mau.external_bridge_servers": ["https://bridges.example.com"]
+#   }
+matrix_static_files_file_matrix_mautrix_configuration_extension_json: '{}'
+
+matrix_static_files_file_matrix_mautrix_configuration_extension: "{{ matrix_static_files_file_matrix_mautrix_configuration_extension_json | from_json if matrix_static_files_file_matrix_mautrix_configuration_extension_json | from_json is mapping else {} }}"
+
+# Holds the final /.well-known/matrix/mautrix configuration (a combination of the default and its extension).
+# You most likely don't need to touch this variable. Instead, see `matrix_static_files_file_matrix_mautrix_configuration_json` or `matrix_static_files_file_matrix_mautrix_configuration_extension_json`.
+matrix_static_files_file_matrix_mautrix_configuration: "{{ matrix_static_files_file_matrix_mautrix_configuration_json | combine(matrix_static_files_file_matrix_mautrix_configuration_extension, recursive=True) }}"
+
+########################################################################
+#                                                                      #
+# /Related to /.well-known/matrix/mautrix                              #
 #                                                                      #
 ########################################################################
 

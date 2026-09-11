@@ -13,7 +13,7 @@ The playbook can install and configure the [mautrix-meta](https://github.com/mau
 
 See the project's [documentation](https://docs.mau.fi/bridges/go/meta/index.html) to learn what it does and why it might be useful to you.
 
-Since this bridge component can bridge to both [Messenger](https://messenger.com/) and [Instagram](https://instagram.com/) and you may wish to do both at the same time, the playbook makes it available via 2 different Ansible roles (`matrix-bridge-mautrix-meta-messenger` and `matrix-bridge-mautrix-meta-instagram`). The latter is a reconfigured copy of the first one (created by `just rebuild-mautrix-meta-instagram` and `bin/rebuild-mautrix-meta-instagram.sh`).
+The mautrix-meta project provides bridging to both [Messenger](https://messenger.com/) and [Instagram](https://instagram.com/), each via a separate bridge (its own binary and container image) since mautrix-meta v26.07. The playbook makes them available via 2 different Ansible roles (`matrix-bridge-mautrix-meta-messenger` and `matrix-bridge-mautrix-meta-instagram`), which can both be enabled at the same time.
 
 This documentation page only deals with the bridge's ability to bridge to Instagram. For bridging to Facebook/Messenger, see [Setting up Messenger bridging via Mautrix Meta](configuring-playbook-bridge-mautrix-meta-messenger.md).
 
@@ -23,7 +23,7 @@ This documentation page only deals with the bridge's ability to bridge to Instag
 
 If you've been using the [mautrix-instagram](./configuring-playbook-bridge-mautrix-instagram.md) bridge, **you'd better get rid of it first** or the 2 bridges will be in conflict:
 
-- both trying to use `@instagrambot:example.com` as their username. This conflict may be resolved by adjusting `matrix_mautrix_instagram_appservice_bot_username` or `matrix_mautrix_meta_instagram_appservice_username`
+- both trying to use `@instagrambot:example.com` as their username. This conflict may be resolved by adjusting `matrix_mautrix_instagram_appservice_bot_username` or `matrix_bridge_mautrix_meta_instagram_appservice_username`
 - both trying to bridge the same DMs
 
 To do so, send a `clean-rooms` command to the management room with the old bridge bot (`@instagrambot:example.com`). It gives you a list of portals and groups of portals you may purge. Proceed with sending commands like `clean recommended`, etc.
@@ -41,7 +41,7 @@ See [this section](configuring-playbook-bridge-mautrix-bridges.md#set-up-double-
 To enable the bridge, add the following configuration to your `inventory/host_vars/matrix.example.com/vars.yml` file:
 
 ```yaml
-matrix_mautrix_meta_instagram_enabled: true
+matrix_bridge_mautrix_meta_instagram_enabled: true
 ```
 
 Before proceeding to [re-running the playbook](./installing.md), you may wish to adjust the configuration further. See below.
@@ -83,5 +83,5 @@ The default logging level for this component is `warn`. If you want to increase 
 
 ```yaml
 # This bridge uses zerolog, so valid levels are: panic, fatal, error, warn, info, debug, trace
-matrix_mautrix_meta_instagram_logging_min_level: debug
+matrix_bridge_mautrix_meta_instagram_logging_min_level: debug
 ```

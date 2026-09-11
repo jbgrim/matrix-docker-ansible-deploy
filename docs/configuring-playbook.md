@@ -53,6 +53,8 @@ For a more custom setup, see the [Other configuration options](#other-configurat
 
   - [Configuring continuwuity](configuring-playbook-continuwuity.md), if you've switched to the [continuwuity](https://continuwuity.org) homeserver implementation
 
+  - [Configuring Tuwunel](configuring-playbook-tuwunel.md), if you've switched to the [Tuwunel](https://matrix-construct.github.io/tuwunel/) homeserver implementation
+
   - [Configuring Dendrite](configuring-playbook-dendrite.md), if you've switched to the [Dendrite](https://matrix-org.github.io/dendrite) homeserver implementation
 
 - Server components:
@@ -87,11 +89,13 @@ Web clients for Matrix that you can host on your own domains.
 
 - [Setting up Cinny](configuring-playbook-client-cinny.md), if you've enabled [Cinny](https://github.com/ajbura/cinny), a web client focusing primarily on simple, elegant and secure interface
 
-- [Setting up Sable](configuring-playbook-client-sable.md), if you've enabled [Sable](https://github.com/7w1/sable), a web client focusing primarily on simple, elegant and secure interface
+- [Setting up Sable](configuring-playbook-client-sable.md), if you've enabled [Sable](https://github.com/SableClient/Sable), a web client focusing primarily on simple, elegant and secure interface
 
 - [Setting up SchildiChat Web](configuring-playbook-client-schildichat-web.md), if you've enabled [SchildiChat Web](https://schildi.chat/), a web client based on [Element Web](https://element.io/) with some extras and tweaks
 
 - [Setting up FluffyChat Web](configuring-playbook-client-fluffychat-web.md), if you've enabled [FluffyChat Web](https://github.com/krille-chan/fluffychat), a cute cross-platform messenger (web, iOS, Android) for Matrix written in [Flutter](https://flutter.dev/)
+
+- [Setting up Commet](configuring-playbook-client-commet.md), if you've enabled [Commet](https://github.com/commetchat/commet), a Matrix web client
 
 
 ### Authentication and user-related
@@ -102,17 +106,13 @@ Extend and modify how users are authenticated on your homeserver.
 
 - [Setting up Appservice Double Puppet](configuring-playbook-appservice-double-puppet.md)
 
-- [Setting up Synapse Admin](configuring-playbook-synapse-admin.md)
-
-- [Setting up matrix-registration](configuring-playbook-matrix-registration.md)
+- [Setting up Ketesa](configuring-playbook-ketesa.md)
 
 - [Setting up the REST authentication password provider module](configuring-playbook-rest-auth.md) (advanced)
 
 - [Setting up the Shared Secret Auth password provider module](configuring-playbook-shared-secret-auth.md) (advanced)
 
 - [Setting up the LDAP authentication password provider module](configuring-playbook-ldap-auth.md) (advanced)
-
-- [Setting up matrix-ldap-registration-proxy](configuring-playbook-matrix-ldap-registration-proxy.md) (advanced)
 
 - [Setting up Synapse Simple Antispam](configuring-playbook-synapse-simple-antispam.md) (advanced)
 
@@ -146,6 +146,10 @@ Bridges can be used to connect your Matrix installation with third-party communi
 
 - [Setting up Mautrix Google Messages bridging](configuring-playbook-bridge-mautrix-gmessages.md)
 
+- [Setting up Mautrix Google Voice bridging](configuring-playbook-bridge-mautrix-gvoice.md)
+
+- [Setting up Mautrix LinkedIn bridging](configuring-playbook-bridge-mautrix-linkedin.md)
+
 - [Setting up Mautrix Whatsapp bridging](configuring-playbook-bridge-mautrix-whatsapp.md)
 
 - [Setting up Instagram bridging via Mautrix Meta](configuring-playbook-bridge-mautrix-meta-instagram.md)
@@ -160,13 +164,13 @@ Bridges can be used to connect your Matrix installation with third-party communi
 
 - [Setting up Mautrix wsproxy for bridging Android SMS or Apple iMessage](configuring-playbook-bridge-mautrix-wsproxy.md)
 
+- [Setting up RustPush (iMessage) bridging](configuring-playbook-bridge-rustpush.md)
+
 - [Setting up Appservice IRC bridging](configuring-playbook-bridge-appservice-irc.md)
 
 - [Setting up Appservice Discord bridging](configuring-playbook-bridge-appservice-discord.md)
 
-- [Setting up Appservice Kakaotalk bridging](configuring-playbook-bridge-appservice-kakaotalk.md)
-
-- [Setting up Beeper LinkedIn bridging](configuring-playbook-bridge-beeper-linkedin.md)
+- [Setting up Beeper LINE bridging](configuring-playbook-bridge-beeper-line.md)
 
 - [Setting up matrix-hookshot](configuring-playbook-bridge-hookshot.md) — a bridge between Matrix and multiple project management services, such as [GitHub](https://github.com), [GitLab](https://about.gitlab.com) and [JIRA](https://www.atlassian.com/software/jira).
 
@@ -182,17 +186,17 @@ Bridges can be used to connect your Matrix installation with third-party communi
 
 - [Setting up Heisenbridge bouncer-style IRC bridging](configuring-playbook-bridge-heisenbridge.md)
 
+- [Setting up a Matrix <-> Meshtastic bridge](configuring-playbook-bridge-meshtastic-relay.md)
+
 - [Setting up WeChat bridging](configuring-playbook-bridge-wechat.md)
 
 ### Bots
 
 Bots provide various additional functionality to your installation.
 
-- [Setting up baibot](configuring-playbook-bot-baibot.md) — a bot through which you can talk to various [AI](https://en.wikipedia.org/wiki/Artificial_intelligence) / [Large Language Models](https://en.wikipedia.org/wiki/Large_language_model) services ([OpenAI](https://openai.com/)'s [ChatGPT](https://openai.com/blog/chatgpt/) and [others](https://github.com/etkecc/baibot/blob/main/docs/providers.md))
+- [Setting up baibot](configuring-playbook-bot-baibot.md) — a bot through which you can talk to various [AI](https://en.wikipedia.org/wiki/Artificial_intelligence) / [Large Language Models](https://en.wikipedia.org/wiki/Large_language_model) services (the privacy-first [Venice](configuring-playbook-bot-baibot.md#venice) we recommend, [OpenAI](https://openai.com/)'s [ChatGPT](https://openai.com/blog/chatgpt/), and [others](https://github.com/etkecc/baibot/blob/main/docs/providers.md))
 
 - [Setting up matrix-reminder-bot](configuring-playbook-bot-matrix-reminder-bot.md) — a bot to remind you about stuff
-
-- [Setting up matrix-registration-bot](configuring-playbook-bot-matrix-registration-bot.md) — a bot to create and manage registration tokens to invite users
 
 - [Setting up maubot](configuring-playbook-bot-maubot.md) — a plugin-based Matrix bot system
 
@@ -203,6 +207,8 @@ Bots provide various additional functionality to your installation.
 - [Setting up Draupnir](configuring-playbook-bot-draupnir.md) — a moderation tool/bot, forked from Mjolnir and maintained by its former leader developer
 
 - [Setting up Draupnir for all/D4A](configuring-playbook-appservice-draupnir-for-all.md) — like the [Draupnir bot](configuring-playbook-bot-draupnir.md) mentioned above, but running in appservice mode and supporting multiple instances
+
+- [Setting up Meowlnir](configuring-playbook-bot-meowlnir.md) — a moderation tool/bot which speaks the same policy list protocol as Draupnir and Mjolnir, but runs in appservice mode and can override policies coming from lists you do not control
 
 - [Setting up Buscarron](configuring-playbook-bot-buscarron.md) — a bot you can use to send any form (HTTP POST, HTML) to a (encrypted) Matrix room
 
@@ -261,9 +267,13 @@ Various services that don't fit any other categories.
 
 - [Setting up the Sliding Sync proxy](configuring-playbook-sliding-sync-proxy.md) for clients which require Sliding Sync support (like old Element X versions, before it got switched to Simplified Sliding Sync)
 
+- [Setting up Appservice Kakaotalk bridging](configuring-playbook-bridge-appservice-kakaotalk.md) (removed; the upstream repository has become unreachable and the component could only be installed by self-building it)
+
 - [Setting up Appservice Slack bridging](configuring-playbook-bridge-appservice-slack.md) (removed; this component has been discontinued)
 
 - [Setting up Appservice Webhooks bridging](configuring-playbook-bridge-appservice-webhooks.md) (deprecated; the bridge's author suggests taking a look at [matrix-hookshot](https://github.com/matrix-org/matrix-hookshot) as a replacement, which can also be [installed using this playbook](configuring-playbook-bridge-hookshot.md))
+
+- [Setting up Beeper LinkedIn bridging](configuring-playbook-bridge-beeper-linkedin.md) (unmaintained; the [upstream repository](https://github.com/beeper/linkedin) has been archived. Consider [setting up Mautrix LinkedIn bridging](configuring-playbook-bridge-mautrix-linkedin.md))
 
 - [Setting up the Dimension integration manager](configuring-playbook-dimension.md) ([unmaintained](https://github.com/spantaleev/matrix-docker-ansible-deploy/issues/2806#issuecomment-1673559299); after [installing](installing.md))
 
@@ -276,6 +286,12 @@ Various services that don't fit any other categories.
 - [Setting up ma1sd Identity Server](configuring-playbook-ma1sd.md) (removed; this component has been unmaintained for a long time, so it has been removed from the playbook.)
 
 - [Setting up matrix-bot-chatgpt](configuring-playbook-bot-chatgpt.md) (unmaintained; the bridge's author suggests taking a look at [baibot](https://github.com/etkecc/baibot) as a replacement, which can also be [installed using this playbook](configuring-playbook-bot-baibot.md))
+
+- [Setting up matrix-ldap-registration-proxy](configuring-playbook-matrix-ldap-registration-proxy.md) (removed; the repository of the source code has been removed)
+
+- [Setting up matrix-registration](configuring-playbook-matrix-registration.md) (removed; this component has been unmaintained)
+
+- [Setting up matrix-registration-bot](configuring-playbook-bot-matrix-registration-bot.md) (removed; this component has been unmaintained)
 
 - [Setting up Mautrix Facebook bridging](configuring-playbook-bridge-mautrix-facebook.md) (deprecated in favor of the Messenger/Instagram bridge with [mautrix-meta-messenger](configuring-playbook-bridge-mautrix-meta-messenger.md))
 
